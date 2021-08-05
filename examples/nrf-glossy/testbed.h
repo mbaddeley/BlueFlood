@@ -17,7 +17,7 @@
 //test CT with two nodes, where each node sends alone for 10 rounds to measure individual links
 #define TWO_NODES_EXPERIMENT (TESTBED==WIRED_TESTBED)
 
-/* Put the node in sleep forever: for disabling nodes after jobs are done in the testbed. 
+/* Put the node in sleep forever: for disabling nodes after jobs are done in the testbed.
 * Do not enable this for normal use. This disables the mote.
 */
 #ifndef TEST_SLEEP_NODE_FOREVER
@@ -29,15 +29,13 @@
 #endif
 
 #ifndef INITATOR_NODE_INDEX
-#define INITATOR_NODE_INDEX 0 
+#define INITATOR_NODE_INDEX 0
 #endif
 
 #if TESTBED==HOME_TESTBED
 #define TESTBED_DIAMETER (2)
-//#define TESTBED_IDS (uint32_t[]){0x7b150560UL, 0xddf8a17fUL, 0x8e28b37dUL, 0x1c30a5f9UL, 0x70f96a53UL, 0x5cfdb15UL, 0x724d2a67UL, 0x7475364dUL, 0x74231ca7UL, 0x2fa5d86eUL}
-//#define TESTBED_PI_IDS (uint8_t[]){4,5,6,7,8,10,20,21,22,28}
-#define TESTBED_IDS (uint32_t[]){0x4c7a76aeUL, 0x3f55b1ca, 0x5cfdb15UL, 0x1204d131UL, 0xb9514f78UL, 0xe158ae56UL, 0x4568e2a6UL, 0x8d5a02cUL}
-#define TESTBED_PI_IDS (uint8_t[]){2,3,10,12,16,17,19,20}
+#define TESTBED_IDS (uint32_t[]){0x8f6578b9, 0x1e166842, 0xf41a8cf3, 0x3da2113a}
+#define TESTBED_PI_IDS (uint8_t[]){1,2,3,4}
 #define TESTBED_SIZE sizeof(TESTBED_PI_IDS)
 
 #elif TESTBED==IOTLAB_SACLAY
@@ -73,26 +71,26 @@
 
 #elif TESTBED==CAU_TESTBED
 #define TESTBED_DIAMETER (3)
-// 1       #@ Sep 10 2019 16:58:01, ID: 0xa8d4c97d, 
-// 2       #@ Sep 10 2019 16:58:01, ID: 0x921a4434, 
-// 3       #@ Sep 10 2019 16:58:01, ID: 0x43c18ccc, 
-// 4       #@ Sep 10 2019 16:58:01, ID: 0xb4fddd93, 
-// 5       #@ Sep 10 2019 16:58:01, ID: 0x27e5a59, 
-// 6       #@ Sep 10 2019 16:58:01, ID: 0x8036b5ea, 
-// 7       #@ Sep 10 2019 16:58:01, ID: 0x4a8f1926, 
-// 8       #@ Sep 10 2019 16:58:01, ID: 0x39f7b9e3, 
+// 1       #@ Sep 10 2019 16:58:01, ID: 0xa8d4c97d,
+// 2       #@ Sep 10 2019 16:58:01, ID: 0x921a4434,
+// 3       #@ Sep 10 2019 16:58:01, ID: 0x43c18ccc,
+// 4       #@ Sep 10 2019 16:58:01, ID: 0xb4fddd93,
+// 5       #@ Sep 10 2019 16:58:01, ID: 0x27e5a59,
+// 6       #@ Sep 10 2019 16:58:01, ID: 0x8036b5ea,
+// 7       #@ Sep 10 2019 16:58:01, ID: 0x4a8f1926,
+// 8       #@ Sep 10 2019 16:58:01, ID: 0x39f7b9e3,
 // 9       #@ Sep 10 2019 16:58:01, ID: 0xd73c5005,
-// 10      #@ Sep 10 2019 16:58:01, ID: 0x7dd93314, 
-// 12      #@ Sep 10 2019 16:58:01, ID: 0x9fb4c897, 
-// 13      #@ Sep 10 2019 16:58:01, ID: 0x22087f8e, 
-// 14      #@ Sep 10 2019 16:58:01, ID: 0x9463fd32, 
-// 15      #@ Sep 10 2019 16:58:01, ID: 0xece2f14c, 
-// 16      #@ Sep 10 2019 16:58:01, ID: 0x1add226c, 
-// 17      #@ Sep 10 2019 16:58:01, ID: 0xbd08d46b, 
-// 18      #@ Sep 10 2019 16:58:01, ID: 0xe7c767e3, 
-// 19      #@ Sep 10 2019 16:58:01, ID: 0x1a36886, 
-// 20      #@ Sep 10 2019 16:58:01, ID: 0x59c34e8f, 
-// 21      #@ Oct 10 2019         , ID: 0xbda9a2e0, 
+// 10      #@ Sep 10 2019 16:58:01, ID: 0x7dd93314,
+// 12      #@ Sep 10 2019 16:58:01, ID: 0x9fb4c897,
+// 13      #@ Sep 10 2019 16:58:01, ID: 0x22087f8e,
+// 14      #@ Sep 10 2019 16:58:01, ID: 0x9463fd32,
+// 15      #@ Sep 10 2019 16:58:01, ID: 0xece2f14c,
+// 16      #@ Sep 10 2019 16:58:01, ID: 0x1add226c,
+// 17      #@ Sep 10 2019 16:58:01, ID: 0xbd08d46b,
+// 18      #@ Sep 10 2019 16:58:01, ID: 0xe7c767e3,
+// 19      #@ Sep 10 2019 16:58:01, ID: 0x1a36886,
+// 20      #@ Sep 10 2019 16:58:01, ID: 0x59c34e8f,
+// 21      #@ Oct 10 2019         , ID: 0xbda9a2e0,
 
 #define TESTBED_IDS (uint32_t[]){0xa8d4c97d,0x921a4434,0x43c18ccc, 0xb4fddd93, 0x27e5a59,0x8036b5ea,0x4a8f1926,0x39f7b9e3,0xd73c5005,0x7dd93314,0x9fb4c897,0x22087f8e,0x9463fd32,0xece2f14c,0x1add226c,0xbd08d46b,0xe7c767e3,0x1a36886,0x59c34e8f,0xbda9a2e0}
 #define TESTBED_PI_IDS (uint8_t[]){1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21}
@@ -108,7 +106,7 @@
 #define mote13  (0x38c0457aUL)
 
 #define TESTBED_IDS (uint32_t[]){mote10,mote11,mote12,mote13}
-#define TESTBED_PI_IDS (uint8_t[]){10,11,12,13} 
+#define TESTBED_PI_IDS (uint8_t[]){10,11,12,13}
 #define TESTBED_SIZE sizeof(TESTBED_PI_IDS)
 
 #elif TESTBED==TABLE_TESTBED
@@ -143,7 +141,7 @@ mote20,mote21,mote22,mote24\
 20,21,22,24\
 20,21,22,24\
 20,21,22,24\
-} 
+}
 #define TESTBED_SIZE sizeof(TESTBED_PI_IDS)
 
 #elif TESTBED==WIRED_TESTBED
@@ -166,7 +164,7 @@ mote20,mote21,mote22,mote24\
 //#define TESTBED_IDS (uint32_t[]){0x7b150560UL, 0xddf8a17fUL, 0x8e28b37dUL, 0x1c30a5f9UL, 0x70f96a53UL, 0x5cfdb15UL, 0x724d2a67UL, 0x7475364dUL, 0x74231ca7UL, 0x2fa5d86eUL}
 //#define TESTBED_PI_IDS (uint8_t[]){4,5,6,7,8,10,20,21,22,28}
 #define TESTBED_IDS (uint32_t[]){mote20,mote21,mote22,mote24}
-#define TESTBED_PI_IDS (uint8_t[]){20,21,22,24} 
+#define TESTBED_PI_IDS (uint8_t[]){20,21,22,24}
 #define TESTBED_SIZE sizeof(TESTBED_PI_IDS)
 
 #elif TESTBED==HELLOWORLD_TESTBED

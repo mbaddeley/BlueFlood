@@ -24,10 +24,10 @@ REPEAT ?= 1
 # HOME_TESTBED_INT_PORT:=
 # HOME_TESTBED_EXT_PORT:=
 # HOME_TESTBED_USER:=
-include testbeds_credentials.env
+# include testbeds_credentials.env
 
-GCC_INSTALL_ROOT	:= ~/opt/gnu-mcu-eclipse/arm-none-eabi-gcc/7.2.1-1.1-20180401-0515
-GCC_VERSION			:= 7.2.1
+GCC_INSTALL_ROOT	:= /home/michael/Compilers/gcc-arm-none-eabi-7
+GCC_VERSION			:= 7.3.1
 GCC_PREFIX			:= arm-none-eabi
 
 
@@ -63,7 +63,7 @@ initiator?=0 #initiator node ID
 test_mode_tx_carrier?=0 #do not tx/rx data, but transmit a constant unmodulated carrier (by keeping the radio in idle mode in slots instead of starting tx/rx)
 #unnecessary
 DURATION ?= 10 #duration of the experiment
-TESTBED_CONF?=WIRED_TESTBED #Default testbed 
+TESTBED_CONF?=WIRED_TESTBED #Default testbed
 round_robin_initiator ?= 0 #switch initiator every round
 cpu_busywait ?= 0
 
@@ -167,11 +167,11 @@ start_jobs:
 testbedsync:
 	rsync -ravz --no-perms --no-owner --no-group -e "ssh -p${CAU_PORT}" ${CAU_USER}@${CAU_SERVER}:/home/${CAU_USER}/jobs/ ./cau_testbed/
 
-testbedschedule2: 
+testbedschedule2:
 	scp -P${CAU_PORT} $(FNAME).hex ${CAU_TESTBED_USER}@${CAU_SERVER}:/home/${CAU_TESTBED_USER}/newjob.nrf52.hex
 	ssh -p${CAU_PORT} ${CAU_TESTBED_USER}@${CAU_SERVER} "python /usr/testbed/scripts/testbed.py create --name '${NAME}' --platform 'nrf52' --duration ${DURATION} --copy-from /home/${CAU_TESTBED_USER}/newjob.nrf52.hex"
 
-testbedstart: 
+testbedstart:
 	# ssh -p${CAU_PORT} ${CAU_USER}@${CAU_SERVER} "python /usr/testbed/scripts/testbed.py status"
 	ssh -p${CAU_PORT} ${CAU_USER}@${CAU_SERVER} "python /usr/testbed/scripts/testbed.py start"
 
@@ -180,15 +180,15 @@ testbedcompileschedule: $(CONTIKI_PROJECT)
 	scp -P${CAU_PORT} $(CONTIKI_PROJECT).hex ${CAU_USER}@${CAU_SERVER}:/home/${CAU_USER}/newjob.nrf52.hex
 	for i in $(shell seq 0 ${REPEAT}); do ssh -p${CAU_PORT} ${CAU_USER}@${CAU_SERVER} "python /usr/testbed/scripts/testbed.py create --name '${FIRMWARE_NAME}' --platform 'nrf52' --duration ${DURATION} --copy-from /home/${CAU_USER}/newjob.nrf52.hex --hosts /home/${CAU_USER}/all-hosts"; done
 
-testbedschedule: 
+testbedschedule:
 	scp -P${CAU_PORT} $(FNAME).hex ${CAU_USER}@${CAU_SERVER}:/home/${CAU_USER}/newjob.nrf52.hex
 	ssh -p${CAU_PORT} ${CAU_USER}@${CAU_SERVER} "python /usr/testbed/scripts/testbed.py create --name '${NAME}' --platform 'nrf52' --duration ${DURATION} --copy-from /home/${CAU_USER}/newjob.nrf52.hex --hosts /home/${CAU_USER}/all-hosts"
 
-testbedschedulehomeext: 
+testbedschedulehomeext:
 	scp -P${HOME_TESTBED_EXT_PORT} $(FNAME).hex ${HOME_TESTBED_USER}@${HOME_TESTBED_EXT_URL}:/home/${HOME_TESTBED_USER}/newjob.nrf52.hex
 	ssh -p${HOME_TESTBED_EXT_PORT} ${HOME_TESTBED_USER}@${HOME_TESTBED_EXT_URL} "python /usr/testbed/scripts/testbed.py create --name '${NAME}' --platform 'nrf52' --duration ${DURATION} --copy-from /home/${HOME_TESTBED_USER}/newjob.nrf52.hex --hosts /home/${HOME_TESTBED_USER}/all-hosts"
 
-testbedschedulehome: 
+testbedschedulehome:
 	scp -P${HOME_TESTBED_INT_PORT} $(FNAME).hex ${HOME_TESTBED_USER}@${HOME_TESTBED_INT_URL}:/home/${HOME_TESTBED_USER}/newjob.nrf52.hex
 	ssh -p${HOME_TESTBED_INT_PORT} ${HOME_TESTBED_USER}@${HOME_TESTBED_INT_URL} "python /usr/testbed/scripts/testbed.py create --name '${NAME}' --platform 'nrf52' --duration ${DURATION} --copy-from /home/${HOME_TESTBED_USER}/newjob.nrf52.hex --hosts /home/${HOME_TESTBED_USER}/all-hosts"
 
@@ -223,7 +223,7 @@ sync-logs:
 
 programext:
 	#make dirty-channel.flash MOTE=100
-	ls -db /Volumes/DAPLINK*/ | gxargs -n 1 -d '\n' cp dirty-channel.hex 
+	ls -db /Volumes/DAPLINK*/ | gxargs -n 1 -d '\n' cp dirty-channel.hex
 
 logcommit:
 	rm -f exp-logs/exp$(EXP).log
@@ -236,7 +236,7 @@ log:
 	picocom -fh -b $(uartbr) --imap lfcrlf /dev/${uart_device} | tee exp-logs/exp$(EXP).log
 
 program:
-	make FIRMWARE=$(CONTIKI_PROJECT).hex upload 
+	make FIRMWARE=$(CONTIKI_PROJECT).hex upload
 
 flashall:
 	for M in 10 11 12 13 ; do \
@@ -258,7 +258,7 @@ eraseall:
 
 doall: clean all flashall resetall
 
-resetall: 
+resetall:
 	for M in 10 11 12 13 ; do \
 		echo $$M ; \
 		make MOTE=$$M reset ; \
@@ -267,7 +267,7 @@ resetall:
 logtimeoutcommit:
 	rm -f exp-logs/exp$(EXP).log
 	touch exp-logs/exp$(EXP).log
-	gtimeout -s ABRT --kill-after=$$((${DURATION}+2)) --foreground $(DURATION) picocom --noreset -fh -b $(uartbr) --imap lfcrlf /dev/${uart_device} --logfile ./exp-logs/exp$(EXP).log	
+	gtimeout -s ABRT --kill-after=$$((${DURATION}+2)) --foreground $(DURATION) picocom --noreset -fh -b $(uartbr) --imap lfcrlf /dev/${uart_device} --logfile ./exp-logs/exp$(EXP).log
 	git add -f exp-logs/exp$(EXP).log
 	git commit -m"exp$(EXP).log"
 
@@ -282,7 +282,7 @@ graztestbedschedule: graztestbedjson_diss
 
 graztestbedschedulecollect: graztestbedjson_collect
 	@curl -H "Content-Type: application/json" -X POST -d @dirty-channel.json "https://iti-testbed.tugraz.at/api/queue/create_job?key=${GRAZ_APIKEY}"
-	
+
 grazqueue:
 	@curl -H "Content-Type: application/json" -X GET "https://iti-testbed.tugraz.at/api/queue?key=${GRAZ_APIKEY}"
 
@@ -290,7 +290,7 @@ grazbatchdownload:
 	@for i in $(shell seq ${JOB_MIN} ${JOB_MAX}); do make grazdownload JOB_ID=$${i}; done;
 
 grazextractids:
-	@for i in $(seq 100 300); do if [ -f "graz_testbed/logs_${JOB_ID}/log_$${i}.txt" ]; then cpuid=$(shell head graz_testbed/logs_${JOB_ID}/log_$${i}.txt | grep -a "ID:" | cut -d':' -f6 |sort -u|cut -d',' -f1); printf "0x%x, " $${cpuid}; fi; if [ -f  graz_testbed/logs_${JOB_ID}/log_$${i}.txt ]; then printf "%d, " $${i}; fi; done; printf "\n" 
+	@for i in $(seq 100 300); do if [ -f "graz_testbed/logs_${JOB_ID}/log_$${i}.txt" ]; then cpuid=$(shell head graz_testbed/logs_${JOB_ID}/log_$${i}.txt | grep -a "ID:" | cut -d':' -f6 |sort -u|cut -d',' -f1); printf "0x%x, " $${cpuid}; fi; if [ -f  graz_testbed/logs_${JOB_ID}/log_$${i}.txt ]; then printf "%d, " $${i}; fi; done; printf "\n"
 
 quickpdr:
 	@for i in $(shell seq ${JOB_MIN} ${JOB_MAX}); do \
@@ -320,25 +320,25 @@ grazevaluatentx:
 					make clean && make capture=0 initiator=0 n_channels=3 overrive_ch37=0 round_robin_initiator=0 cpu_busywait=0 DURATION=${DURATION} ntx=$${ntx} tx_power=$${tx_power0} TESTBED_CONF=GRAZ_TESTBED ble_mode=$${mode} GRAZ_LAYOUT=1 period=400 jamming=0 log=true -j4 graztestbedschedule; \
 				done; \
 			done; \
-	done; 
+	done;
 
 grazevaluatench:
 	@for nch in 9 40; do \
 	for mode in 3 4 5 6 15; do \
 	make clean && make capture=0 initiator=0 n_channels=$${nch} overrive_ch37=0 round_robin_initiator=0 cpu_busywait=0 DURATION=${DURATION} ntx=4 tx_power=8 TESTBED_CONF=GRAZ_TESTBED ble_mode=$${mode} GRAZ_LAYOUT=1 period=200 jamming=0 log=true -j4 graztestbedschedule; \
 	done; \
-	done; 
+	done;
 
 grazevaluatepkt:
 	@for pkt in 76; do \
 	for mode in 3 4 5 6 15; do \
 	make clean && make capture=0 initiator=0 packet_size=$${pkt} n_channels=3 overrive_ch37=0 round_robin_initiator=0 cpu_busywait=0 DURATION=${DURATION} ntx=4 tx_power=8 TESTBED_CONF=GRAZ_TESTBED ble_mode=$${mode} GRAZ_LAYOUT=1 period=200 jamming=0 log=true -j4 graztestbedschedule; \
 	done; \
-	done; 
+	done;
 
 grazdownload:
 	#extract the cookie token, login using username and password, then download using the login cookie. Finally, show the downloaded file size. Repeat until successful. Then, extract the logs and delete the zip file.
-	
+
 	@fsize=0; MIN_LOG_SIZE=50; counter=0; \
 	while [ "$${fsize}" -lt "$${MIN_LOG_SIZE}" ] && [ "$${counter}" -lt "4" ] ; do \
 	echo "Trial $${counter}:"; \
@@ -370,20 +370,20 @@ include $(CONTIKI)/Makefile.include
 
 # dosch: iotlab
 # 	ID:=$(shell experiment-cli submit --name $(EXPNAME) --duration $(duration) --site-association $(site),script=/Users/beshr/work/chaos-support/eval/iotlab-clitools/aggregator_script.sh,scriptconfig=/Users/beshr/work/chaos-support/eval/iotlab-clitools/aggregator_script_config --list $(COUNT_ACTIVE_NODES),archi=nrf52840dk:multi+site=saclay,$(FIRMWARE_FULL_PATH)); IDD:=$(shell echo "$(ID)"| grep "id"| cut -d':'); echo "$(DATE), $(IDD), $(COUNT_ACTIVE_NODES), $(duration), $(EXPNAME)" >>experiment_reg; cat experiment_reg
-	
+
 # %.schedule:
 # 	python /Users/beshr/work/chaos-support/eval/iotlab-clitools/iotlab-helper.py schedule --archi="nrf52840dk:multi" --site=$(site) --firmware=$*.elf --duration=$(duration) --run --user=$(user)
-	
+
 # schedule-iotlab: iotlab
 # 	python /Users/beshr/work/chaos-support/eval/iotlab-clitools/iotlab-helper.py schedule --archi="nrf52840dk:multi" --site=$(site) --firmware=${FIRMWARE_NAME}.elf --duration=$(duration) --run --user=$(user)
 
 # update-iotlab-nodes:
 # 	IOTLAB_MAPPING=$$(python /Users/beshr/work/chaos-support/eval/iotlab-clitools/iotlab-helper.py list make --site=$(site) --archi="nrf52840dk:multi"); echo "#define IOTLAB_MAPPING $${IOTLAB_MAPPING}" > iotlabnodes.h
-# 	cat iotlabnodes.h 
-	
+# 	cat iotlabnodes.h
+
 # iotlab-fresh: update-iotlab-nodes
 # 	make TARGET=wsn430 clean
-# 	make TARGET=wsn430 iotlab 
+# 	make TARGET=wsn430 iotlab
 
 # iotlab: CFLAGS+= -DTESTBED=IOTLAB_SACLAY -DCOOJA=0
 # iotlab: all

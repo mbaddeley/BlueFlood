@@ -21,7 +21,7 @@
 #define BLE_ADV_PDU_HDR_RXADD_MASK          (0x80)
 /*---------------------------------------------------------------------------*/
 #if (RADIO_MODE_CONF == RADIO_MODE_MODE_Ieee802154_250Kbit)
-/* RF center frequency for each channel index (offset from 2400 MHz), spacing is 5MHz for 15.4 -- not standard!, but channels with indices 11--26 are standard 
+/* RF center frequency for each channel index (offset from 2400 MHz), spacing is 5MHz for 15.4 -- not standard!, but channels with indices 11--26 are standard
 fc = 2405 + 5 × (Channel Number − 11), nrf frequency setting is an offset to 2400MHz */
 const uint8_t ble_hw_frequency_channels[40] = {
   0,5,85,90,95,25,30,35,40,45,0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,85,90,95,0,85,90,95,BLE_CHANNEL_37_FREQ,80,25
@@ -49,14 +49,14 @@ void my_radio_set_tx_power(uint8_t p){
   nrf_tx_power = p;
 }
 /*---------------------------------------------------------------------------*/
-void my_radio_get_id(uint32_t* my_id){  
+void my_radio_get_id(uint32_t* my_id){
   if(my_id != NULL){
     *my_id = NRF_FICR->DEVICEID[0];
     //*my_id = NRF_FICR->DEVICEID[1] << (uint64_t)32;
   }
 }
 /*---------------------------------------------------------------------------*/
-void my_radio_init(uint32_t* my_id, void* my_tx_buffer) 
+void my_radio_init(uint32_t* my_id, void* my_tx_buffer)
 {
   //disable instruction cache!
   // NRF_NVMC->ICACHECNF = 0x00;
@@ -78,20 +78,20 @@ void my_radio_init(uint32_t* my_id, void* my_tx_buffer)
   #else
   #define RADIO_MODECNF0_DTX_MYMODE RADIO_MODECNF0_DTX_Center
   #endif
-  
+
   #ifdef NRF51
   NRF_RADIO->MODECNF0 = (RADIO_MODECNF0_DTX_MYMODE << RADIO_MODECNF0_DTX_Pos);
   //nrf_radio_set_radio_mode(RADIO_MODE_MODE_Nrf_1Mbit);
   nrf_radio_set_radio_mode(RADIO_MODE_CONF);
 
-  #else 
-  NRF_RADIO->MODECNF0 = (RADIO_MODECNF0_RU_Fast << RADIO_MODECNF0_RU_Pos) 
+  #else
+  NRF_RADIO->MODECNF0 = (RADIO_MODECNF0_RU_Fast << RADIO_MODECNF0_RU_Pos)
                       | (RADIO_MODECNF0_DTX_MYMODE << RADIO_MODECNF0_DTX_Pos);
                       //Note: For 802.15.4 and BLE LR mode, only DTX_Center is a valid setting
   NRF_RADIO->MODE = RADIO_MODE_CONF;
   #endif
 
-  /* Packet configuration 
+  /* Packet configuration
     BLE compatible: S0: 1 byte, LEN: 8bits, S1: 0 bits */
   /*
     * Workarounds should be applied only when switching to/from LE Coded PHY
@@ -102,11 +102,11 @@ void my_radio_init(uint32_t* my_id, void* my_tx_buffer)
     *
     * nRF52840 Rev 1 Errata
     * [191] RADIO: High packet error rate in BLE Long Range mode
-    */    
+    */
   #if (RADIO_MODE_CONF == RADIO_MODE_MODE_Ble_1Mbit || RADIO_MODE_CONF == RADIO_MODE_MODE_Ble_2Mbit)
-  
-  NRF_RADIO->PCNF1 = NRF_PCNF1; 
-  NRF_RADIO->PCNF0 = (RADIO_MODE_CONF == RADIO_MODE_MODE_Ble_1Mbit) ? NRF_PCNF0_1M : NRF_PCNF0_2M; 
+
+  NRF_RADIO->PCNF1 = NRF_PCNF1;
+  NRF_RADIO->PCNF0 = (RADIO_MODE_CONF == RADIO_MODE_MODE_Ble_1Mbit) ? NRF_PCNF0_1M : NRF_PCNF0_2M;
 
   /* [164] */
   *(volatile uint32_t *)0x4000173C &= ~0x80000000;
@@ -115,12 +115,12 @@ void my_radio_init(uint32_t* my_id, void* my_tx_buffer)
     *(volatile uint32_t *) 0x40001740 =
                     ((*((volatile uint32_t *) 0x40001740)) & 0x7FFFFFFF);
     #endif /* RADIO_REV_C_OR_RADIO_REV_1 */
-  
+
   #elif (RADIO_MODE_CONF == RADIO_MODE_MODE_Ble_LR125Kbit || RADIO_MODE_CONF == RADIO_MODE_MODE_Ble_LR500Kbit)
-  
-  NRF_RADIO->PCNF1 = NRF_PCNF1; 
-  NRF_RADIO->PCNF0 = NRF_PCNF0_CODED; 
-  
+
+  NRF_RADIO->PCNF1 = NRF_PCNF1;
+  NRF_RADIO->PCNF0 = NRF_PCNF0_CODED;
+
   /* [164] */
   *(volatile uint32_t *)0x4000173C |= 0x80000000;
   *(volatile uint32_t *)0x4000173C =
@@ -134,8 +134,8 @@ void my_radio_init(uint32_t* my_id, void* my_tx_buffer)
 
 
   #elif (RADIO_MODE_CONF == RADIO_MODE_MODE_Ieee802154_250Kbit)
-  NRF_RADIO->PCNF1 = NRF_PCNF1_154; 
-  NRF_RADIO->PCNF0 = NRF_PCNF0_154; 
+  NRF_RADIO->PCNF1 = NRF_PCNF1_154;
+  NRF_RADIO->PCNF0 = NRF_PCNF0_154;
 
   #endif /* RADIO_MODE_CONF */
 
@@ -170,26 +170,26 @@ void my_radio_init(uint32_t* my_id, void* my_tx_buffer)
   #elif (RADIO_MODE_CONF == RADIO_MODE_MODE_Ble_LR125Kbit || RADIO_MODE_CONF == RADIO_MODE_MODE_Ble_LR500Kbit || RADIO_MODE_CONF == RADIO_MODE_MODE_Ieee802154_250Kbit)
 
   NRF_RADIO->SHORTS = (RADIO_SHORTS_PHYEND_DISABLE_Enabled << RADIO_SHORTS_PHYEND_DISABLE_Pos);
-  
+
   #endif
 
   #if !TRIGGER_RADIO_START_WITH_TIMER
   NRF_RADIO->SHORTS |= (RADIO_SHORTS_READY_START_Enabled << RADIO_SHORTS_READY_START_Pos);
   #endif
-  
+
   NRF_RADIO->SHORTS |= RADIO_SHORTS_DISABLED_RSSISTOP_Msk;
   #if RADIO_MODE_CONF != RADIO_MODE_MODE_Ieee802154_250Kbit
   //RSSI shorts - in case of 802.15.4, the PPI starts RSSISTART upon recieving a FRAMESTART event
   NRF_RADIO->SHORTS |= RADIO_SHORTS_ADDRESS_RSSISTART_Msk;
-  
-  
+
+
   // NRF_RADIO->TEST       = (RADIO_TEST_CONST_CARRIER_Enabled << RADIO_TEST_CONST_CARRIER_Pos)
 	// 		                     | (RADIO_TEST_PLL_LOCK_Enabled << RADIO_TEST_PLL_LOCK_Pos);
 
-  //NRF_RADIO->BASE0   = 0x89BED600UL; 
-  NRF_RADIO->BASE1   = 0x43434343UL;  
-  NRF_RADIO->PREFIX0 = 0x23C34300UL; 
-  NRF_RADIO->PREFIX1 = 0x13E363A3UL; 
+  //NRF_RADIO->BASE0   = 0x89BED600UL;
+  NRF_RADIO->BASE1   = 0x43434343UL;
+  NRF_RADIO->PREFIX0 = 0x23C34300UL;
+  NRF_RADIO->PREFIX1 = 0x13E363A3UL;
 
   /* Set base0 with the advertising access address */
   NRF_RADIO->BASE0 = (BLE_ACCESS_ADDR_ADV << 8) & 0xFFFFFF00;
@@ -218,7 +218,7 @@ void my_radio_init(uint32_t* my_id, void* my_tx_buffer)
 	NRF_PPI->CHEN |= (1 << RADIO_FRAME_EVENT_PPI_CH);
 
   #endif /* RADIO_MODE_CONF != RADIO_MODE_MODE_Ieee802154_250Kbit */
-  
+
 
   my_radio_get_id(my_id);
 
@@ -275,7 +275,7 @@ void my_radio_off_completely(void)
   /* Enable the Compare event on channel 0 */
   NRF_TIMER1->EVENTS_COMPARE[0] = 0;
   /* count 140 us waiting for radio rampup time */
-  NRF_TIMER1->CC[0]       = MY_RADIO_RAMPUP_TIME_TIMER1_TICKS; 
+  NRF_TIMER1->CC[0]       = MY_RADIO_RAMPUP_TIME_TIMER1_TICKS;
 
   /* Clear event register */
   NRF_RADIO->EVENTS_DISABLED = 0U;
@@ -303,7 +303,7 @@ void my_radio_off_completely(void)
 /*---------------------------------------------------------------------------*/
 void my_radio_off_to_tx(void)
 {
-  /* Enable scheduled tx 
+  /* Enable scheduled tx
    * Pre-defined channel: Timer0-compare[0] -> TxEn */
 	NRF_PPI->CHEN |= (PPI_CHEN_CH20_Enabled << PPI_CHEN_CH20_Pos);
   /* DISABLE RX SCHEDULING SHORTCUT */
@@ -318,7 +318,7 @@ void my_radio_off_to_tx(void)
   /* Enable the Compare event on channel 0 */
   NRF_TIMER1->EVENTS_COMPARE[0] = 0;
   /* count 140 us waiting for radio rampup time */
-  NRF_TIMER1->CC[0]       = MY_RADIO_RAMPUP_TIME_TIMER1_TICKS; 
+  NRF_TIMER1->CC[0]       = MY_RADIO_RAMPUP_TIME_TIMER1_TICKS;
 
   NRF_TIMER0->EVENTS_COMPARE[0] = 0;
   /* Clear event register */
@@ -350,7 +350,7 @@ void schedule_rx_abs(uint8_t* buf, int channel, rtimer_clock_t t_abs)
 /*---------------------------------------------------------------------------*/
 void my_radio_off_to_rx(void)
 {
-  /* Enable scheduled tx 
+  /* Enable scheduled tx
    * Pre-defined channel: Timer0-compare[0] -> RxEn */
 	NRF_PPI->CHEN |= (PPI_CHEN_CH21_Enabled << PPI_CHEN_CH21_Pos);
   /* DISABLE TX SCHEDULING SHORTCUT */
@@ -361,7 +361,7 @@ void my_radio_off_to_rx(void)
   /* Enable the Compare event on channel 0 */
   NRF_TIMER1->EVENTS_COMPARE[0] = 0;
   /* count 140 us waiting for radio rampup time */
-  NRF_TIMER1->CC[0]       = MY_RADIO_RAMPUP_TIME_TIMER1_TICKS; 
+  NRF_TIMER1->CC[0]       = MY_RADIO_RAMPUP_TIME_TIMER1_TICKS;
 
   NRF_TIMER0->EVENTS_COMPARE[0] = 0;
   /* Clear event register */
@@ -379,13 +379,13 @@ void my_radio_off_to_rx(void)
   NRF_PPI->CHEN |= (1 << RADIO_T0_RX_EVENT_PPI_CH); //enable RXen debug pin PPI
   NRF_PPI->CHEN &= ~(1 << RADIO_T0_TX_EVENT_PPI_CH); //disable TXen debug pin PPI
   #endif /* NRF_RADIO_DEBUG_STATE */
-  
+
   BUSYWAIT_UNTIL(NRF_RADIO->EVENTS_DISABLED != 0U, US_TO_RTIMERTICKS(2)); //arbitrary timeout
   NRF_RADIO->EVENTS_DISABLED = 0U;
 
 }
 /*---------------------------------------------------------------------------*/
-void my_radio_send(uint8_t* buf, int channel) 
+void my_radio_send(uint8_t* buf, int channel)
 {
   #if NRF_RADIO_DEBUG_STATE
   NRF_PPI->CHEN |= (1 << RADIO_T0_TX_EVENT_PPI_CH); //enable TXen debug pin PPI
@@ -397,7 +397,7 @@ void my_radio_send(uint8_t* buf, int channel)
     /* Enable the Compare event on channel 0 */
   NRF_TIMER1->EVENTS_COMPARE[0] = 0;
   /* count 140 us waiting for radio rampup time */
-  NRF_TIMER1->CC[0]       = MY_RADIO_RAMPUP_TIME_TIMER1_TICKS; 
+  NRF_TIMER1->CC[0]       = MY_RADIO_RAMPUP_TIME_TIMER1_TICKS;
   /* Clear event register */
   NRF_RADIO->EVENTS_DISABLED = 0U;
   NRF_RADIO->EVENTS_END = 0U;
@@ -420,7 +420,7 @@ void my_radio_send(uint8_t* buf, int channel)
 
 }
 /*---------------------------------------------------------------------------*/
-uint8_t my_radio_rx(uint8_t* buf, int channel) 
+uint8_t my_radio_rx(uint8_t* buf, int channel)
 {
   #if NRF_RADIO_DEBUG_STATE
   NRF_PPI->CHEN |= (1 << RADIO_T0_RX_EVENT_PPI_CH); //enable RXen debug pin PPI
@@ -432,7 +432,7 @@ uint8_t my_radio_rx(uint8_t* buf, int channel)
   /* Enable the Compare event on channel 0 */
   NRF_TIMER1->EVENTS_COMPARE[0] = 0;
   /* count 140 us waiting for radio rampup time */
-  NRF_TIMER1->CC[0]       = MY_RADIO_RAMPUP_TIME_TIMER1_TICKS; 
+  NRF_TIMER1->CC[0]       = MY_RADIO_RAMPUP_TIME_TIMER1_TICKS;
   /* Clear event register */
   NRF_RADIO->EVENTS_DISABLED = 0U;
   NRF_RADIO->EVENTS_END = 0U;
@@ -459,9 +459,9 @@ uint8_t my_radio_rx(uint8_t* buf, int channel)
   return 0;
 }
 /*---------------------------------------------------------------------------*/
-static void 
-output_radio_events_gpio_init(void) 
-{  
+static void
+output_radio_events_gpio_init(void)
+{
   #if NRF_RADIO_DEBUG_STATE
   #ifdef NRF51
   NRF_GPIOTE->POWER = 0UL;
@@ -591,10 +591,10 @@ static void timer1_init(void)
   /* Enable the Compare event on channel 0 */
   NRF_TIMER1->EVENTS_COMPARE[0] = 0;
   /* count 140 us waiting for radio rampup time */
-  NRF_TIMER1->CC[0]       = 140*16UL; 
+  NRF_TIMER1->CC[0]       = 140*16UL;
 
   /* Enable overflow event and overflow interrupt */
-  NRF_TIMER1->INTENCLR = 0xffffffffUL; 
+  NRF_TIMER1->INTENCLR = 0xffffffffUL;
 
   /* Enable shorts for auto-reset
    * */
@@ -616,7 +616,7 @@ static void timer1_init(void)
   #endif
 }
 
-void testbed_cofigure_pins() 
+void testbed_cofigure_pins()
 {
   /* configure buttons 1-4 as input with no pull up */
   nrf_gpio_range_cfg_input(PORT(0,11),PORT(0,12), NRF_GPIO_PIN_NOPULL);

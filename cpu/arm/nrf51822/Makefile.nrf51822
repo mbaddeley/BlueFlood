@@ -26,8 +26,8 @@ endif
 #FIXME: quick fix to get targets working in Eclipse
 PWD = $(shell pwd)
 
-GCC_INSTALL_ROOT	:= /usr/local/Caskroom/gcc-arm-embedded/7-2017-q4-major/gcc-arm-none-eabi-7-2017-q4-major/
-GCC_VERSION			:= 7.2.1
+GCC_INSTALL_ROOT	:= /home/michael/Compilers/gcc-arm-none-eabi-7
+GCC_VERSION			:= 7.3.1
 GCC_PREFIX			:= arm-none-eabi
 
 CC      := $(GCC_INSTALL_ROOT)/bin/$(GCC_PREFIX)-gcc
@@ -87,7 +87,7 @@ INCLUDEDIRS	 = $(shell find $(CONTIKI_CPU) -type d)
 INCLUDEDIRS	+= $(GCC_INSTALL_ROOT)/lib/gcc/$(GCC_PREFIX)/$(GCC_VERSION)/include/
 INCLUDEDIRS	+= $(GCC_INSTALL_ROOT)/lib/gcc/$(GCC_PREFIX)/$(GCC_VERSION)/include-fixed/
 #$(info "Included: $(INCLUDEDIRS) " )
- 
+
 ### Compiler related stuff
 ###
 CFLAGS  += -Os		# O2 for size
@@ -123,9 +123,9 @@ LDFLAGS += -Map=$(TARGET).map
 # use newlib in nano version
 LDFLAGS += --specs=nano.specs
 LDFLAGS += -u _printf_float
-LDFLAGS += -mcpu=$(CPU) 
-LDFLAGS += -mthumb 
-LDFLAGS += -mabi=aapcs 
+LDFLAGS += -mcpu=$(CPU)
+LDFLAGS += -mthumb
+LDFLAGS += -mabi=aapcs
 LDFLAGS += -T$(LD_SCRIPT)
 LDFLAGS	+= -D$(DEVICE)
 LDFLAGS	+= -D$(BOARD)
@@ -143,14 +143,14 @@ CONTIKI_CPU_DIRS = . nrf gcc contiki link peripherals dev
 
 ### CPU-dependent source files
 #CONTIKI_CPU_SOURCEFILES = $(shell find . -name *.c | awk -F/ '{print $$NF}')
-CONTIKI_CPU_SOURCEFILES = system_nrf51.c clock.c rtimer-arch.c 
+CONTIKI_CPU_SOURCEFILES = system_nrf51.c clock.c rtimer-arch.c
 CONTIKI_CPU_SOURCEFILES += clock-nrf.c simple-uart.c nrf-delay.c nrf-radio.c nrf-init.c
 CONTIKI_CPU_SOURCEFILES += watchdog.c
 #ASSEMBLY_SRC = gcc_startup_$(DEVICESERIES).S
 CONTIKI_CPU_SOURCEFILES += gcc-startup-$(DEVICESERIES).S
 CONTIKI_SOURCEFILES += $(CONTIKI_CPU_SOURCEFILES)
 
-#Create binary files 
+#Create binary files
 UPLOAD_TARGETS = $(CONTIKI_PROJECT:=.bin)
 TARGET_SIZE = $(CONTIKI_PROJECT:=.$(TARGET))
 obj-bin: $(UPLOAD_TARGETS)
@@ -195,19 +195,19 @@ CUSTOM_RULE_LINK=1
 %.$(TARGET): %.elf %.hex %.bin
 	cp $< $@
 
-## Find out the size of the compiled file 
-size : 
+## Find out the size of the compiled file
+size :
 	$(SIZE) $(TARGET_SIZE)
 
 ## Program device/Reset device
-upload: rm.jlink2 upload.jlink2 
+upload: rm.jlink2 upload.jlink2
 	@echo "Starting uploading"
 	$(JLINK) upload.jlink2
 	@echo "Done uploading"
-	
+
 rm.jlink2:
 	-rm -rf *.jlink
-		
+
 upload.jlink2:
 	echo "device nrf51822\nspeed 1000\nw4 4001e504 1\nloadbin $(PWD)/$(ARGS) $(FLASH_START_ADDRESS)\nr\ng\nqc\n" > upload.jlink
 
@@ -249,5 +249,3 @@ erase-all: erase-all.jlink2
 
 erase-all.jlink2:
 	echo "device nrf51822\nw4 4001e504 2\nw4 4001e50c 1\nw4 4001e514 1\nr\nexit\n" > erase-all.jlink2
-
-

@@ -28,8 +28,7 @@
   #define PRINTF(...)
 #endif /* ENABLE_BLUEFLOOD_LOGS */
 
-#define TESTBED_LOG_STYLE (TESTBED!=WIRED_TESTBED)
-
+#define TESTBED_LOG_STYLE       1
 #ifndef FIRMWARE_TIMESTAMP_STR
 #define FIRMWARE_TIMESTAMP_STR (__DATE__ " " __TIME__)
 #endif
@@ -79,7 +78,7 @@
 /*---------------------------------------------------------------------------*/
 #define SLOT_PROCESSING_TIME_PKT_END    (US_TO_RTIMERTICKS(8))
 #define SLOT_PROCESSING_TIME_PKT_START  (US_TO_RTIMERTICKS(80))
-#define SLOT_PROCESSING_TIME  (SLOT_PROCESSING_TIME_PKT_END + SLOT_PROCESSING_TIME_PKT_START)   
+#define SLOT_PROCESSING_TIME  (SLOT_PROCESSING_TIME_PKT_END + SLOT_PROCESSING_TIME_PKT_START)
 
 #define GUARD_TIME_SHORT                (US_TO_RTIMERTICKS(0))
 #define GUARD_TIME                      (US_TO_RTIMERTICKS(32))
@@ -175,7 +174,7 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
   #endif /* NUMBER_OF_CHANNELS == 40,18,9 */
 
   #endif /* NUMBER_OF_CHANNELS == 3 */
-  
+
   #define HOP_INDEX(round,slot) (((round)*16+(slot))%sizeof(ble_hopping_list))
   //#define GET_CHANNEL(round,slot) ( ( 40-(NUMBER_OF_CHANNELS) ) + ( (round)*16 + (slot) )%(NUMBER_OF_CHANNELS) )
   #define GET_CHANNEL(round,slot) (ble_hw_frequency_channels[ble_channels_list[ble_hopping_list[HOP_INDEX(round,slot)]%NUMBER_OF_CHANNELS]])
@@ -299,8 +298,8 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
                                 (NRF_LFLEN_BITS << RADIO_PCNF0_LFLEN_Pos) | \
                                 (RADIO_PCNF0_PLEN_32bitZero << RADIO_PCNF0_PLEN_Pos)
 
-/* Packet configuration 
-    Little endian, 
+/* Packet configuration
+    Little endian,
     base address: 3 bytes (+1 prefix ==> 4bytes for BLE access address)
     0 static packet length
     and configure max packet length */
@@ -308,13 +307,13 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
                                   (RADIO_PCNF1_ENDIAN_Little << RADIO_PCNF1_ENDIAN_Pos) | \
                                   (3UL << RADIO_PCNF1_BALEN_Pos)          | \
                                   (0 << RADIO_PCNF1_STATLEN_Pos)          | \
-                                  (RADIO_PACKET_MAX_LEN << RADIO_PCNF1_MAXLEN_Pos))       
+                                  (RADIO_PACKET_MAX_LEN << RADIO_PCNF1_MAXLEN_Pos))
 
 #define NRF_PCNF1_154               ( (RADIO_PCNF1_WHITEEN_Disabled << RADIO_PCNF1_WHITEEN_Pos)| \
                                   (RADIO_PCNF1_ENDIAN_Little << RADIO_PCNF1_ENDIAN_Pos) | \
                                   (0UL << RADIO_PCNF1_BALEN_Pos)          | \
                                   (0 << RADIO_PCNF1_STATLEN_Pos)          | \
-                                  (RADIO_PACKET_MAX_LEN << RADIO_PCNF1_MAXLEN_Pos))                         
+                                  (RADIO_PACKET_MAX_LEN << RADIO_PCNF1_MAXLEN_Pos))
 /*---------------------------------------------------------------------------*/
 /* Output radio state on GPIO */
 #define PORT(P,PIN)                     ((P)*32uL+(PIN))
@@ -325,12 +324,12 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
 #define LED3_PIN                        PORT(1,7)
 #define LED4_PIN                        PORT(1,8)
 
-#define ROUND_INDICATOR_PIN             LED2_PIN 
-#define SLOT1_INDICATOR_PIN             LED3_PIN 
-#define RADIO_ADDRESS_EVENT_PIN         LED4_PIN     
+#define ROUND_INDICATOR_PIN             LED2_PIN
+#define SLOT1_INDICATOR_PIN             LED3_PIN
+#define RADIO_ADDRESS_EVENT_PIN         LED4_PIN
 // #define RADIO_READY_EVENT_PIN        PORT(1,11) // disabled
-#define RADIO_TXEN_PIN                  PORT(1,2) // txen 
-#define RADIO_RXEN_PIN                  PORT(1,3) // rxen 
+#define RADIO_TXEN_PIN                  PORT(1,2) // txen
+#define RADIO_RXEN_PIN                  PORT(1,3) // rxen
 // #define RADIO_PAYLOAD_PIN            PORT(1,14) // payload
 // #define RTC_SCHEDULE_PIN             PORT(1,11)  //disabled
 #define RTC_FIRE_PIN                    PORT(1,4)
@@ -341,14 +340,14 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
 #define LED3_PIN                        PORT(0,15)
 #define LED4_PIN                        PORT(0,16)
 
-#define ROUND_INDICATOR_PIN             LED2_PIN 
-#define SLOT1_INDICATOR_PIN             LED3_PIN 
-#define RADIO_ADDRESS_EVENT_PIN         PORT(1,10) // address      
+#define ROUND_INDICATOR_PIN             LED2_PIN
+#define SLOT1_INDICATOR_PIN             LED3_PIN
+#define RADIO_ADDRESS_EVENT_PIN         PORT(1,10) // address
 // #define RADIO_READY_EVENT_PIN        PORT(1,11) // disabled
-#define RADIO_TXEN_PIN                  PORT(1,12) // txen 
-#define RADIO_RXEN_PIN                  PORT(1,13) // rxen 
+#define RADIO_TXEN_PIN                  PORT(1,12) // txen
+#define RADIO_RXEN_PIN                  PORT(1,13) // rxen
 // #define RADIO_PAYLOAD_PIN            PORT(1,14) // payload
-// #define RTC_SCHEDULE_PIN             PORT(0,30) 
+#define RTC_SCHEDULE_PIN                PORT(0,30)
 #define RTC_FIRE_PIN                    PORT(0,31)
 #endif /* TESTBED==GRAZ_TESTBED */
 
@@ -358,7 +357,7 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
 #define RADIO_TXEN_GPIOTE_CH     2UL //manual control
 #define RADIO_RXEN_GPIOTE_CH     3UL //manual control
 #define RADIO_PAYLOAD_GPIOTE_CH     4UL //manual control
-#define RTC_FIRE_GPIOTE_CH     5UL 
+#define RTC_FIRE_GPIOTE_CH     5UL
 #define RTC_SCHEDULE_GPIOTE_CH     6UL //manual control
 
 #define RADIO_ADDRESS_EVENT_PPI_CH      0UL
@@ -414,7 +413,7 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
                               (((X) == RADIO_MODE_MODE_Ble_2Mbit) ? "Ble_2Mbit" : \
                               (((X) == RADIO_MODE_MODE_Ble_LR125Kbit) ? "Ble_LR125Kbit" : \
                               (((X) == RADIO_MODE_MODE_Ble_LR500Kbit) ? "Ble_LR500Kbit" : \
-                              (((X) == RADIO_MODE_MODE_Ieee802154_250Kbit) ? "Zgb_250Kbit" : TOSTRING(X)) ) ) ) ) 
+                              (((X) == RADIO_MODE_MODE_Ieee802154_250Kbit) ? "Zgb_250Kbit" : TOSTRING(X)) ) ) ) )
 /*---------------------------------------------------------------------------*/
 #define RTC_PRESCALER 32  // 512 ==> f=64Hz ==> 15.625ms ticks, 256 ==> 128Hz, 7.1825ms
 #define F_RTC_DIV8 ((32768uL/8) / RTC_PRESCALER)

@@ -28,8 +28,8 @@ PWD = $(shell pwd)
 
 ifndef GCC_INSTALL_ROOT
 echo "Error! I do not know which compiler to use. Define in your Makefile the toolchain path and version: GCC_INSTALL_ROOT, GCC_VERSION, GCC_PREFIX"
-GCC_INSTALL_ROOT	:= /opt/gcc-arm-none-eabi-7-2017-q4-major
-GCC_VERSION			:= 7.2.1
+GCC_INSTALL_ROOT	:= /home/michael/Compilers/gcc-arm-none-eabi-7
+GCC_VERSION			:= 7.3.1
 GCC_PREFIX			:= arm-none-eabi
 endif
 
@@ -61,7 +61,7 @@ SMALL?=1
 BOARD			:= PCA10056
 CPU				:= cortex-m4
 #DEVICE 			:= NRF52 #for 52832
-DEVICE 			:= NRF52840_XXAA 
+DEVICE 			:= NRF52840_XXAA
 DEVICESERIES 	:= nrf52840
 BLE_REQD		:= BLE_STACK_SUPPORT_REQD
 ifeq ($(NRF52_DK_REVISION),)
@@ -97,7 +97,7 @@ INCLUDEDIRS	 = $(shell find $(CONTIKI_CPU) -type d)
 INCLUDEDIRS	+= $(GCC_INSTALL_ROOT)/lib/gcc/$(GCC_PREFIX)/$(GCC_VERSION)/include/
 INCLUDEDIRS	+= $(GCC_INSTALL_ROOT)/lib/gcc/$(GCC_PREFIX)/$(GCC_VERSION)/include-fixed/
 #$(info "Included: $(INCLUDEDIRS) " )
- 
+
 ### Compiler related stuff
 ###
 ifeq ($(SMALL),1)
@@ -144,9 +144,9 @@ LDFLAGS += -Map=$(TARGET).map
 LDFLAGS += --specs=nano.specs -lc
 LDFLAGS += -u _printf_float
 LDFLAGS += --specs=nosys.specs
-LDFLAGS += -mcpu=$(CPU) 
-LDFLAGS += -mthumb 
-LDFLAGS += -mabi=aapcs 
+LDFLAGS += -mcpu=$(CPU)
+LDFLAGS += -mthumb
+LDFLAGS += -mabi=aapcs
 LDFLAGS += -T$(LD_SCRIPT)
 LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 LDFLAGS	+= -D$(DEVICE)
@@ -167,14 +167,14 @@ OBJDUMP_FLAGS += --disassemble --source --disassembler-options=force-thumb
 CONTIKI_CPU_DIRS = . nrf gcc contiki link peripherals dev cmsis cmsis/cmsis-core
 
 ### CPU-dependent source files
-#CONTIKI_CPU_SOURCEFILES = $(shell find . -name *.c | awk -F/ '{print $$NF}') 
-CONTIKI_CPU_SOURCEFILES = sbrk.c cmsis_nvic.c system_nrf52.c clock.c rtimer-arch.c 
+#CONTIKI_CPU_SOURCEFILES = $(shell find . -name *.c | awk -F/ '{print $$NF}')
+CONTIKI_CPU_SOURCEFILES = sbrk.c cmsis_nvic.c system_nrf52.c clock.c rtimer-arch.c
 CONTIKI_CPU_SOURCEFILES += clock-nrf.c simple-uart.c nrf-delay.c nrf-radio.c nrf-init.c
 CONTIKI_CPU_SOURCEFILES += watchdog.c
 CONTIKI_CPU_SOURCEFILES += gcc_startup_$(DEVICESERIES).S
 CONTIKI_SOURCEFILES += $(CONTIKI_CPU_SOURCEFILES)
 
-#Create binary files 
+#Create binary files
 UPLOAD_TARGETS = $(CONTIKI_PROJECT:=.bin)
 TARGET_SIZE = $(CONTIKI_PROJECT:=.$(TARGET))
 obj-bin: $(UPLOAD_TARGETS)
@@ -219,18 +219,18 @@ CUSTOM_RULE_LINK=0
 %.$(TARGET): %.elf %.hex %.bin
 	cp $< $@
 
-## Find out the size of the compiled file 
-size: 
+## Find out the size of the compiled file
+size:
 	$(SIZE) $(TARGET_SIZE)
 
 ## Program device/Reset device
-upload: 
+upload:
 	@echo "Uploading $(FIRMWARE)"
 	sh $(NRF_PROG_SCRIPT) $(JLINK_SCRIPT_OPTS) --flash $(FIRMWARE)
-	
+
 rm.jlink2:
 	-rm -rf *.jlink
-		
+
 upload.jlink2:
 	echo "device nrf52840\nspeed 8000\nw4 4001e504 1\nloadbin $(PWD)/$(ARGS) $(FLASH_START_ADDRESS)\nr\ng\nqc\n" > upload.jlink
 
@@ -239,7 +239,7 @@ upload.jlink2:
 
 %.flash: %.hex
 	@echo Flashing: $^
-	sh $(NRF_PROG_SCRIPT) $(JLINK_SCRIPT_OPTS) --flash $*.hex 
+	sh $(NRF_PROG_SCRIPT) $(JLINK_SCRIPT_OPTS) --flash $*.hex
 
 erase:
 	sh $(NRF_PROG_SCRIPT) $(JLINK_SCRIPT_OPTS) --erase-all
@@ -255,7 +255,7 @@ upload-softdevice.jlink2:
 	@echo " Resetting in between is needed to disable the protections. "
 	echo "w4 4001e504 1\nloadbin \"$(PWD)/_mainpart.bin\" 0\nloadbin \"$(PWD)/_uicr.bin\" 0x10001000\nr\ng\nexit\n" > $(PWD)/upload-softdevice.jlink2
 
-reset: 
+reset:
 	sh $(NRF_PROG_SCRIPT)  --reset
 
 reset.jlink2:
@@ -272,5 +272,3 @@ erase-all: erase-all.jlink2
 
 erase-all.jlink2:
 	echo "device nrf52840\nw4 4001e504 2\nw4 4001e50c 1\nw4 4001e514 1\nr\nexit\n" > erase-all.jlink2
-
-
