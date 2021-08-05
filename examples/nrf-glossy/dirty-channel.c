@@ -62,7 +62,7 @@ static uint8_t my_tx_buffer[255] = {0};
 static uint8_t my_rx_buffer[255] = {0};
 #if USE_HAMMING_CODE
 static uint8_t encode_decode_buffer[255] = {0};
-#endif 
+#endif
 static ble_beacon_t msg;
 #if PRINT_LAST_RX
 static ble_beacon_t msg_errors[ROUND_LEN];
@@ -159,8 +159,8 @@ PROCESS_THREAD(tx_process, ev, data)
   static uint8_t failed_rounds = 0;
   static int8_t my_index = -1;
   static uint16_t round = 0, slot = 0, logslot=0, join_round = -1, sync_slot = UINT16_MAX;
-  static uint16_t rx_ok = 0, rx_crc_failed = 0, rx_none = 0, tx_done=0, 
-  berr = 0 /* bit errors per round */, 
+  static uint16_t rx_ok = 0, rx_crc_failed = 0, rx_none = 0, tx_done=0,
+  berr = 0 /* bit errors per round */,
   berr_per_pkt_max = 0, berr_per_byte_max = 0;
   static uint32_t rx_ok_total = 0, rx_failed_total = 0, berr_total = 0;
 
@@ -169,7 +169,7 @@ PROCESS_THREAD(tx_process, ev, data)
   #endif
   #if PRINT_LAST_RX
   // static uint8_t berr_pkts[LOG_STATE_SIZE]={0};
-  #endif 
+  #endif
   #if PRINT_TS_DELTA
   static int32_t rx_ts_delta[LOG_STATE_SIZE]={0UL};
   #endif //PRINT_TS_DELTA
@@ -194,13 +194,13 @@ PROCESS_THREAD(tx_process, ev, data)
     my_radio_send(my_tx_buffer, BLE_DEFAULT_CHANNEL);
     #endif
     while(1){
-      PRINTF("#@ %s, ID: 0x%lx, master: 0x%lx, tx power: %d dBm, channel %u = %u MHz (%s), idx %d\n", 
+      PRINTF("#@ %s, ID: 0x%lx, master: 0x%lx, tx power: %d dBm, channel %u = %u MHz (%s), idx %d\n",
       FIRMWARE_TIMESTAMP_STR, my_id, tx_node_id, (int8_t)BLE_DEFAULT_RF_POWER, BLE_DEFAULT_CHANNEL, 2400u+ble_hw_frequency_channels[BLE_DEFAULT_CHANNEL], OVERRIDE_BLE_CHANNEL_37 ? "not std" : "std", my_index);
       watchdog_periodic();
     }
   #elif TEST_SLEEP_NODE_FOREVER
     while(1){
-      PRINTF("#@ %s, ID: 0x%lx, master: 0x%lx, tx power: %d dBm, channel %u = %u MHz (%s)\n", 
+      PRINTF("#@ %s, ID: 0x%lx, master: 0x%lx, tx power: %d dBm, channel %u = %u MHz (%s)\n",
       FIRMWARE_TIMESTAMP_STR, my_id, tx_node_id, (int8_t)BLE_DEFAULT_RF_POWER, BLE_DEFAULT_CHANNEL, 2400u+ble_hw_frequency_channels[BLE_DEFAULT_CHANNEL], OVERRIDE_BLE_CHANNEL_37 ? "not std" : "std");
       watchdog_periodic();
       __disable_irq(); // __enable_irq()
@@ -215,8 +215,8 @@ PROCESS_THREAD(tx_process, ev, data)
       //Enter System-on idle mode
       // __WFE();
       __SEV();
-      __WFE();			
-      __WFE();	
+      __WFE();
+      __WFE();
       //Enter System-off
       NRF_POWER->SYSTEMOFF = 1;
     }
@@ -272,7 +272,7 @@ PROCESS_THREAD(tx_process, ev, data)
       initiator_node_index = round % TESTBED_SIZE;
     } else {
       initiator_node_index = INITATOR_NODE_INDEX;
-    } 
+    }
     #endif /* ROUND_ROBIN_INITIATOR */
     // nrf_gpio_cfg_output(ROUND_INDICATOR_PIN);
     nrf_gpio_pin_toggle(ROUND_INDICATOR_PIN);
@@ -287,7 +287,7 @@ PROCESS_THREAD(tx_process, ev, data)
       // do_tx = (IS_INITIATOR() && (slot < 4) && (slot % 2 == 0)) || (!IS_INITIATOR() && synced && my_turn && (slot % 2 != 0));
       // do_tx = (IS_INITIATOR()) || (!IS_INITIATOR() && synced && my_turn);
       #endif /* ROUND_ROBIN_INITIATOR */
-      
+
       //do_tx = my_id == tx_node_id;
       do_rx = !do_tx;
       if(do_tx){
@@ -309,7 +309,7 @@ PROCESS_THREAD(tx_process, ev, data)
               turn = MSG_TURN_BROADCAST;
             }
           }
-          // turn = (join_round == UINT16_MAX || join_round == -1) ? -1 : ((round - join_round)/10); 
+          // turn = (join_round == UINT16_MAX || join_round == -1) ? -1 : ((round - join_round)/10);
           // turn=(turn % TESTBED_SIZE) +1 ; //give turn to node 1 by default
 
           // if(turn <= 0 || turn == my_index + 1){
@@ -328,7 +328,7 @@ PROCESS_THREAD(tx_process, ev, data)
         #else
         msg.turn = MSG_TURN_BROADCAST; //all nodes are alowed to send
         #endif
-        
+
         #if TEST_CE
         memcpy(msg.uuid, &uuids_array[(round+my_id&0xf)%UUID_LIST_LENGTH], sizeof(msg.uuid));
         //msg.uuid[0] = (round % 2) ? &uuids_array[round%UUID_LIST_LENGTH][0] : my_id >> 24UL;
@@ -400,7 +400,7 @@ PROCESS_THREAD(tx_process, ev, data)
           } else {
             rtimer_clock_t rx_target_time, rx_tn, rx_tref, rx_toffset, t_proc;
             uint8_t rx_missed_slot = 0;
-            /* 
+            /*
             * Note that: tt = t_start_round + slot * SLOT_LEN
             * Round logic started at rx_tref = t_start_round - FIRST_SLOT_OFFSET
             * We want to start rx at rx_target_time
@@ -429,7 +429,7 @@ PROCESS_THREAD(tx_process, ev, data)
                 got_address_event = NRF_RADIO->EVENTS_ADDRESS;
                 #endif
               }
-            }  
+            }
             if(rx_missed_slot || !slot_started) {
               #if PRINT_CUSTOM_DEBUG_MSG
               SPRINTF(dbgmsg, "t %" PRIu32 " %" PRIu32 " n %" PRIu32 " p %" PRIu32 " m %d %d", (t_start_round), rx_target_time, rx_tn, t_proc, rx_missed_slot, slot_started );
@@ -544,13 +544,13 @@ PROCESS_THREAD(tx_process, ev, data)
           #if PRINT_LAST_RX
           uint8_t * pmsg = (uint8_t*)&msg;
           uint8_t * pmsg_errors = (uint8_t*)&msg_errors[logslot];
-          int i; 
+          int i;
           uint8_t berr_byte, berr_per_pkt, berr_xor;
           berr_byte = 0;
           for(i = 0; i < sizeof(ble_beacon_t); i++){
             berr_xor = my_rx_buffer[i] ^ pmsg[i]; /* berr_xor = ones if there is a difference */
             pmsg_errors[i] = berr_xor;
-            if(berr_xor){ 
+            if(berr_xor){
               berr_byte = ((berr_xor & 1) != 0) + ((berr_xor & 2) != 0) + ((berr_xor & 4) != 0) + ((berr_xor & 8) != 0)
               + ((berr_xor & 16)!= 0) + ((berr_xor & 32)!= 0) + ((berr_xor & 64)!= 0) + ((berr_xor & 128)!= 0);
               berr_per_pkt += berr_byte;
@@ -585,7 +585,7 @@ PROCESS_THREAD(tx_process, ev, data)
   PRINTF("bits per packet\n");*/
   // memset(berr_pkts, 0, sizeof(berr_pkts));
   #endif /* PRINT_LAST_RX */
-  
+
   #if TESTBED_LOG_STYLE
     #if PRINT_RX_STATS
     PRINTF("{rx-%d} %u, %u, %u, %u, %lu, %lu, %u, %u, %u, %lu, %d\n", round, rx_ok, rx_crc_failed, rx_none, tx_done, rx_ok_total, rx_ok_total+rx_failed_total, berr_per_byte_max, berr_per_pkt_max, berr /* bit errors per round */, berr_total, sync_slot);
@@ -678,7 +678,7 @@ PROCESS_THREAD(tx_process, ev, data)
 
     #if PRINT_NODE_CONFIG
     if(round % 1024 == 0){
-      PRINTF("#R %u, ID: 0x%lx %d, master: 0x%lx, tx power: %d dBm, channel %u = %u MHz (%s), msg: %d bytes, mode: %s, CE: %d, @ %s\n", 
+      PRINTF("#R %u, ID: 0x%lx %d, master: 0x%lx, tx power: %d dBm, channel %u = %u MHz (%s), msg: %d bytes, mode: %s, CE: %d, @ %s\n",
               round, my_id, my_index, tx_node_id, (int8_t)BLE_DEFAULT_RF_POWER, BLE_DEFAULT_CHANNEL, 2400u+ble_hw_frequency_channels[BLE_DEFAULT_CHANNEL], OVERRIDE_BLE_CHANNEL_37 ? "not std" : "std", sizeof(ble_beacon_t), RADIO_MODE_TO_STR(RADIO_MODE_CONF), TEST_CE, FIRMWARE_TIMESTAMP_STR);
     }
     #endif /* PRINT_NODE_CONFIG */
@@ -716,7 +716,7 @@ PROCESS_THREAD(tx_process, ev, data)
       round_is_late = check_timer_miss(t_start_round, ROUND_PERIOD-TIMER_GUARD, now);
       t_start_round += ROUND_PERIOD;
     }
-    
+
   #if BLUEFLOOD_BUSYWAIT
     /* wait at the end of the round */
     NRF_TIMER0->CC[0] = t_start_round - FIRST_SLOT_OFFSET;;
@@ -742,8 +742,8 @@ PROCESS_THREAD(tx_process, ev, data)
     // __NOP();
     // __NOP();
     // __NOP();
-    /* Go to sleep sequence: 
-     * SEV Set event and WFE wait for event first to consume any previously set event if any, then wait for event to sleep the CPU until an event happens. 
+    /* Go to sleep sequence:
+     * SEV Set event and WFE wait for event first to consume any previously set event if any, then wait for event to sleep the CPU until an event happens.
     */
     __SEV();
     __WFE();
@@ -769,7 +769,7 @@ PROCESS_THREAD(tx_process, ev, data)
 #if !BLUEFLOOD_BUSYWAIT
 
 void rtc_schedule(uint32_t ticks)
-{     
+{
   //trick: RTC schedule function will trigger overflow event to mirror that on the GPIO for debugging purposes
   #ifdef RTC_SCHEDULE_PIN
   // NVIC_DisableIRQ(RTC1_IRQn);

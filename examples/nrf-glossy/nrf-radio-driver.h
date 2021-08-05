@@ -342,37 +342,40 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
 
 #define ROUND_INDICATOR_PIN             LED2_PIN
 #define SLOT1_INDICATOR_PIN             LED3_PIN
-#define RADIO_ADDRESS_EVENT_PIN         PORT(1,10) // address
-// #define RADIO_READY_EVENT_PIN        PORT(1,11) // disabled
-#define RADIO_TXEN_PIN                  PORT(1,12) // txen
-#define RADIO_RXEN_PIN                  PORT(1,13) // rxen
+// #define RADIO_ADDRESS_EVENT_PIN         PORT(1,10) // address
+// #define RADIO_READY_EVENT_PIN           PORT(1,11) // ready
+// #define RADIO_TXEN_PIN                  PORT(1,12) // txen
+// #define RADIO_RXEN_PIN                  PORT(1,13) // rxen
 // #define RADIO_PAYLOAD_PIN            PORT(1,14) // payload
-#define RTC_SCHEDULE_PIN                PORT(0,30)
-#define RTC_FIRE_PIN                    PORT(0,31)
+// #define RTC_SCHEDULE_PIN                PORT(0,30)
+// #define RTC_FIRE_PIN                    PORT(0,31)
+#define RADIO_TX_PIN                    PORT(0,31)
 #endif /* TESTBED==GRAZ_TESTBED */
 
 // Peripheral channel assignments
 #define RADIO_ADDRESS_EVENT_GPIOTE_CH   0UL //PPI
 #define RADIO_READY_EVENT_GPIOTE_CH     1UL //PPI
-#define RADIO_TXEN_GPIOTE_CH     2UL //manual control
-#define RADIO_RXEN_GPIOTE_CH     3UL //manual control
-#define RADIO_PAYLOAD_GPIOTE_CH     4UL //manual control
-#define RTC_FIRE_GPIOTE_CH     5UL
-#define RTC_SCHEDULE_GPIOTE_CH     6UL //manual control
+#define RADIO_TXEN_GPIOTE_CH            2UL //manual control
+#define RADIO_RXEN_GPIOTE_CH            3UL //manual control
+#define RADIO_PAYLOAD_GPIOTE_CH         4UL //manual control
+#define RTC_FIRE_GPIOTE_CH              5UL //???
+#define RTC_SCHEDULE_GPIOTE_CH          6UL //manual control
+#define RADIO_TX_GPIOTE_CH              1UL //manual control
 
 #define RADIO_ADDRESS_EVENT_PPI_CH      0UL
 #define RADIO_END_EVENT_PPI_CH          1UL
 #define RADIO_READY_EVENT_PPI_CH        2UL
-#define RADIO_T0_TX_EVENT_PPI_CH     3UL
-#define RADIO_T0_RX_EVENT_PPI_CH     4UL
+#define RADIO_T0_TX_EVENT_PPI_CH        3UL
+#define RADIO_T0_RX_EVENT_PPI_CH        4UL
 // #define RADIO_PAYLOAD_EVENT_PPI_CH     5UL
-#define RADIO_DISABLED_EVENT_PPI_CH 6UL
-#define RADIO_FRAME_EVENT_PPI_CH     5UL
+#define RADIO_FRAME_EVENT_PPI_CH        5UL
+#define RADIO_DISABLED_EVENT_PPI_CH     6UL
 
-#define TIMER0C0_TIMER1_START_PPI_CH 7UL
-#define TIMER1_RADIO_START_PPI_CH 8UL
-#define RTC_FIRE_PPI_CH 9UL
-#define RTC_SCHEDULE_PPI_CH 10UL
+#define TIMER0C0_TIMER1_START_PPI_CH    7UL
+#define TIMER1_RADIO_START_PPI_CH       8UL
+#define RTC_FIRE_PPI_CH                 9UL
+#define RTC_SCHEDULE_PPI_CH             10UL
+
 
 #if 0
 #define DEBUG_GPIO_OUTPUT_TXEN() do{ NRF_GPIOTE->TASKS_OUT[RADIO_TXEN_GPIOTE_CH] = 1UL; }while(0)
