@@ -16,6 +16,8 @@
 #include "dev/radio.h"
 #include "string.h"
 
+#define UNUSED(x) (void)(x)
+
 /*---------------------------------------------------------------------------*/
 
 #ifndef RADIO_SHORTS_ENABLED
@@ -121,6 +123,7 @@ static void RELEASE_LOCK(void) {
     }
   }
   locked--;
+
 }
 /*---------------------------------------------------------------------------*/
 

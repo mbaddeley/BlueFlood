@@ -19,12 +19,14 @@
 #include "net/packetbuf.h"
 #include "net/netstack.h"
 
-#define DEBUG 0
-#if DEBUG
-#define PRINTF(...) printf(__VA_ARGS__)
-#else
-#define PRINTF(...) do {} while (0)
-#endif
+// #define DEBUG 0
+// #if DEBUG
+// #define PRINTF(...) printf(__VA_ARGS__)
+// #else
+// #define PRINTF(...) do {} while (0)
+// #endif
+
+#define UNUSED(x) (void)(x)
 
 /*---------------------------------------------------------------------------*/
 PROCESS(nrf_radio_process, "nRF Radio driver");
@@ -110,7 +112,7 @@ nrf_radio_init(void)
 
     //disable CRC
     //NRF_RADIO->CRCINIT = 0x0UL;      /* CRC initial value */
-    //NRF_RADIO->CRCPOLY = 0x0UL;      /* CRC polynomial in explicit +1 format */                
+    //NRF_RADIO->CRCPOLY = 0x0UL;      /* CRC polynomial in explicit +1 format */
     //NRF_RADIO->CRCCNF = (RADIO_CRCCNF_LEN_Disabled << RADIO_CRCCNF_LEN_Pos); // Number of checksum bits
 
     if ((NRF_RADIO->CRCCNF & RADIO_CRCCNF_LEN_Msk) == (RADIO_CRCCNF_LEN_Two << RADIO_CRCCNF_LEN_Pos))
@@ -257,7 +259,7 @@ nrf_radio_transmit(unsigned short transmit_len)
   RELEASE_LOCK();
   PRINTF("PACKET SEND\n\r");
 
-#warning "parameter transmit_len not used"
+// #warning "parameter transmit_len not used"
 
   return 1;
 }
@@ -664,6 +666,7 @@ RADIO_IRQHandler(void)
 PROCESS_THREAD(nrf_radio_process, ev, data)
 {
   int len;
+  UNUSED(len);
   PROCESS_BEGIN();
 
   PRINTF("nrf_radio_process: started\n\r");
@@ -687,4 +690,3 @@ PROCESS_THREAD(nrf_radio_process, ev, data)
   PROCESS_END();
 }
 /*---------------------------------------------------------------------------*/
-

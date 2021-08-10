@@ -69,6 +69,9 @@ static ble_beacon_t msg_errors[ROUND_LEN];
 #endif /* PRINT_LAST_RX */
 static uint64_t corrupt_msg_index = 0;
 static uint32_t my_id = 0;
+
+#define UNUSED(x) (void)(x)
+
 /*---------------------------------------------------------------------------*/
 PROCESS(tx_process, "TX process");
 AUTOSTART_PROCESSES(&tx_process);
@@ -162,6 +165,7 @@ PROCESS_THREAD(tx_process, ev, data)
   static uint16_t rx_ok = 0, rx_crc_failed = 0, rx_none = 0, tx_done=0,
   berr = 0 /* bit errors per round */,
   berr_per_pkt_max = 0, berr_per_byte_max = 0;
+  UNUSED(berr_per_pkt_max); UNUSED(berr_per_byte_max);
   static uint32_t rx_ok_total = 0, rx_failed_total = 0, berr_total = 0;
 
   #if PRINT_RSSI
@@ -399,6 +403,7 @@ PROCESS_THREAD(tx_process, ev, data)
             slot_started = 1;
           } else {
             rtimer_clock_t rx_target_time, rx_tn, rx_tref, rx_toffset, t_proc;
+            UNUSED(t_proc);
             uint8_t rx_missed_slot = 0;
             /*
             * Note that: tt = t_start_round + slot * SLOT_LEN
@@ -416,7 +421,7 @@ PROCESS_THREAD(tx_process, ev, data)
             if(!rx_missed_slot){
               // t_proc = RTIMER_NOW();
               schedule_rx_abs(my_rx_buffer, GET_CHANNEL(round, slot), rx_target_time);
-              t_proc = RTIMER_NOW() - rx_tn;
+              // rtimer_clock_t t_proc = RTIMER_NOW() - rx_tn;
               BUSYWAIT_UNTIL_ABS(NRF_TIMER0->EVENTS_COMPARE[0] != 0U, rx_target_time + 2*guard_time + SLOT_PROCESSING_TIME_PKT_START );
               slot_started = NRF_TIMER0->EVENTS_COMPARE[0];
               if(slot_started){
@@ -573,7 +578,7 @@ PROCESS_THREAD(tx_process, ev, data)
     rx_ok_total += rx_ok;
     berr_total += berr;
     rx_failed_total += rx_crc_failed + rx_none;
-    uint32_t rx_ok_percent = (rx_ok_total*100) / (MAX(1, rx_ok_total+rx_failed_total));
+    // uint32_t rx_ok_percent = (rx_ok_total*100) / (MAX(1, rx_ok_total+rx_failed_total));
 
 #if ENABLE_BLUEFLOOD_LOGS
 
@@ -704,6 +709,7 @@ PROCESS_THREAD(tx_process, ev, data)
     memset(my_rx_buffer, 0, msg.radio_len);
     //msg.round=round;
     rtimer_clock_t now, t_start_round_old;
+    UNUSED(t_start_round_old);
     now = RTIMER_NOW();
     #define TIMER_GUARD 16
     uint8_t round_is_late = check_timer_miss(t_start_round, ROUND_PERIOD-TIMER_GUARD, now);
@@ -726,7 +732,7 @@ PROCESS_THREAD(tx_process, ev, data)
   #else
     rtimer_clock_t tnow = RTIMER_NOW();
     uint32_t rtc_ticks = RTIMER_TO_RTC((t_start_round - tnow))-RTC_GUARD; //save one RTC tick for preprocessing!
-    rtimer_clock_t sleep_period = (t_start_round - tnow);
+    // rtimer_clock_t sleep_period = (t_start_round - tnow);
     // PRINTF("going to sleep: now %lu for %" PRId32 " hf = %lu hf %lu lf\n", tnow, sleep_period, RTC_TO_RTIMER(rtc_ticks), rtc_ticks);
     rtc_schedule(rtc_ticks);
     /* go to sleep mode: put prepherals to sleep then sleep the CPU */
