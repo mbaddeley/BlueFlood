@@ -49,7 +49,7 @@ Ble_LR125Kbit=5 #/*!< Long range 125 kbit/s (TX Only - RX supports both) */
 Ble_LR500Kbit=6 #/*!< Long range 500 kbit/s (TX Only - RX supports both) */
 Ieee802154_250Kbit=15 #/*!< IEEE 802.15.4-2006 250 kbit/s */
 
-period ?= 200 #in ms
+period ?= 500 #in ms
 tx_power ?= 0 #in dB
 capture ?= 0 #evaluate capture mode
 ble_mode ?= $(Ble_1Mbit) #Bluetooth mode
@@ -57,7 +57,7 @@ tx_offset ?= 0 #inject TX delay
 packet_size ?= 38 #packet size in bytes
 #default PDU for standard ibeacon
 n_channels ?= 1 #how many channels to use. Up to 40.
-overrive_ch37 ?= 0 #use a special frequency for channel 37 to avoid Bluetooth traffic
+overrive_ch37 ?= 1 #use a special frequency for channel 37 to avoid Bluetooth traffic
 ntx ?= 4 #how many repititions
 initiator?=0 #initiator node ID
 test_mode_tx_carrier?=0 #do not tx/rx data, but transmit a constant unmodulated carrier (by keeping the radio in idle mode in slots instead of starting tx/rx)
@@ -82,7 +82,10 @@ CONTIKI_WITH_CHAOS = 0
 CONTIKI_WITH_IPV4 = 0
 CONTIKI_WITH_IPV6 = 0
 CONTIKI_WITH_RIME = 1
-CFLAGS += -DENABLE_BLUEFLOOD_LOGS=$(log) -DROUND_PERIOD_MS_PARAM=$(period) -DTEST_SLEEP_NODE_FOREVER=$(sleep_node_forever) -DBLUEFLOOD_BUSYWAIT=$(cpu_busywait) -DROUND_ROBIN_INITIATOR=$(round_robin_initiator) -DRADIO_TEST_TX_CARRIER=$(test_mode_tx_carrier) -DINITATOR_NODE_INDEX=$(initiator) -DUART_BAUDRATE=$(UART_BR_CONF) -DOVERRIDE_BLE_CHANNEL_37$(overrive_ch37) -DNTX=$(ntx) -DNUMBER_OF_CHANNELS=$(n_channels) -DPACKET_TEST_SIZE_CONF=$(packet_size) -DBLE_DEFAULT_RF_POWER=$(tx_power) -DTEST_CE=$(capture) -DRADIO_MODE_CONF=$(ble_mode) -DARTIFICIAL_TX_OFFSET=$(tx_offset)
+CFLAGS += -DENABLE_BLUEFLOOD_LOGS=$(log) -DROUND_PERIOD_MS_PARAM=$(period) -DTEST_SLEEP_NODE_FOREVER=$(sleep_node_forever) -DBLUEFLOOD_BUSYWAIT=$(cpu_busywait)
+CFLAGS += -DROUND_ROBIN_INITIATOR=$(round_robin_initiator) -DRADIO_TEST_TX_CARRIER=$(test_mode_tx_carrier) -DINITATOR_NODE_INDEX=$(initiator) -DUART_BAUDRATE=$(UART_BR_CONF)
+CFLAGS += -DOVERRIDE_BLE_CHANNEL_37=$(overrive_ch37) -DNTX=$(ntx) -DNUMBER_OF_CHANNELS=$(n_channels) -DPACKET_TEST_SIZE_CONF=$(packet_size) -DBLE_DEFAULT_RF_POWER=$(tx_power)
+CFLAGS += -DTEST_CE=$(capture) -DRADIO_MODE_CONF=$(ble_mode) -DARTIFICIAL_TX_OFFSET=$(tx_offset)
 ifdef TESTBED_CONF
 CFLAGS += -DTESTBED=$(TESTBED_CONF)
 endif

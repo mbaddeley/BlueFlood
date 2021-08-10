@@ -57,10 +57,10 @@ main(void)
   ctimer_init();
 
   /* Configure the nRF51 inits */
-  nrf_init();
+  // nrf_init();
 
   /* Configure the nRF51 radio */
-  nrf_radio_init();
+  // nrf_radio_init();
 
 #if NETSTACK_CONF_WITH_CHAOS
   NETSTACK_RDC.init();
