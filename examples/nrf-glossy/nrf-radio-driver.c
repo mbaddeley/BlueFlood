@@ -223,7 +223,6 @@ void my_radio_init(uint32_t* my_id, void* my_tx_buffer)
   my_radio_get_id(my_id);
 
   timer1_init();
-  output_radio_events_gpio_init();
 }
 /*---------------------------------------------------------------------------*/
 /* TX after t ticks from now */
@@ -281,6 +280,9 @@ void my_radio_off_completely(void)
   NRF_RADIO->EVENTS_DISABLED = 0U;
   // NRF_RADIO->TASKS_RXEN = 0U;
   // NRF_RADIO->TASKS_TXEN = 0U;
+
+  /* Turn off pin 31 RX debug */
+  NRF_GPIOTE->CONFIG[RADIO_TXRX_GPIOTE_CH] &= ~((RADIO_TX_PIN << GPIOTE_CONFIG_PSEL_Pos) | (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos));
 
   /* Disable radio */
   NRF_RADIO->TASKS_DISABLE = 1U;
@@ -459,169 +461,142 @@ uint8_t my_radio_rx(uint8_t* buf, int channel)
   return 0;
 }
 /*---------------------------------------------------------------------------*/
-static void
-output_radio_events_gpio_init(void)
+void
+my_radio_gpio_init(void)
 {
-  #if NRF_RADIO_DEBUG_STATE
-  #ifdef NRF51
-  NRF_GPIOTE->POWER = 0UL;
-  NRF_GPIOTE->POWER = 1UL;
-  #endif
-  //Disable GPIOTE interrupts
-  NRF_GPIOTE->INTENCLR = 0xffffffffUL;
+  // #ifdef NRF51
+  // NRF_GPIOTE->POWER = 0UL;
+  // NRF_GPIOTE->POWER = 1UL;
+  // #endif
+//   //Disable GPIOTE interrupts
+//   NRF_GPIOTE->INTENCLR = 0xffffffffUL;
+//
+//   /* Unonfigure the channel as the caller expects */
+//   // for (int i = 0; i < 12; i++)
+//   // {
+//   //   NRF_GPIOTE->CONFIG[i] = (GPIOTE_CONFIG_MODE_Disabled << GPIOTE_CONFIG_MODE_Pos) |
+//   //                           (31UL << GPIOTE_CONFIG_PSEL_Pos) |
+//   //                           (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos);
+//   // }
+//   /* Three NOPs are required to make sure configuration is written before setting tasks or getting events */
+//   __NOP();
+//   __NOP();
+//   __NOP();
+//   //configure GPIOTE
+// #if RADIO_ADDRESS_EVENT_PIN
+//   NRF_GPIOTE->CONFIG[RADIO_ADDRESS_EVENT_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
+//                                                       (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
+//                                                       (RADIO_ADDRESS_EVENT_PIN << GPIOTE_CONFIG_PSEL_Pos) |
+//                                                       (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
+// #endif
+// #if RADIO_READY_EVENT_PIN
+//   NRF_GPIOTE->CONFIG[RADIO_READY_EVENT_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
+//                                                     (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
+//                                                     (RADIO_READY_EVENT_PIN << GPIOTE_CONFIG_PSEL_Pos) |
+//                                                     (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
+// #endif
+// #if RADIO_TXEN_PIN
+//   NRF_GPIOTE->CONFIG[RADIO_TXEN_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
+//                                              (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
+//                                              (RADIO_TXEN_PIN << GPIOTE_CONFIG_PSEL_Pos) |
+//                                              (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
+// #endif
+// #if RADIO_RXEN_PIN
+//   NRF_GPIOTE->CONFIG[RADIO_RXEN_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
+//                                              (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
+//                                              (RADIO_RXEN_PIN << GPIOTE_CONFIG_PSEL_Pos) |
+//                                              (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
+// #endif
+// #if RTC_SCHEDULE_PIN
+//   NRF_GPIOTE->CONFIG[RTC_SCHEDULE_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
+//                                              (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
+//                                              (RTC_SCHEDULE_PIN << GPIOTE_CONFIG_PSEL_Pos) |
+//                                              (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
+// #endif
+//
+//   /* Three NOPs are required to make sure configuration is written before setting tasks or getting events */
+//   __NOP();
+//   __NOP();
+//   __NOP();
+//
+//   // /* Clear the event that appears in some cases */
+//   // for (uint8_t i = 0; i < 8; i++)
+//   // {
+//   //   NRF_GPIOTE->EVENTS_IN[i] = 0;
+//   // }
+//
+//   //Link radio events to GPIOTE
+// #if RADIO_ADDRESS_EVENT_PIN
+//   NRF_PPI->CH[RADIO_ADDRESS_EVENT_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_ADDRESS;
+//   NRF_PPI->CH[RADIO_ADDRESS_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_ADDRESS_EVENT_GPIOTE_CH];
+// #endif
+// #if RADIO_END_EVENT_PIN
+//   NRF_PPI->CH[RADIO_END_EVENT_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_END;
+//   NRF_PPI->CH[RADIO_END_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_END_EVENT_GPIOTE_CH];
+// #endif
+// #if RADIO_READY_EVENT_PIN
+//   NRF_PPI->CH[RADIO_READY_EVENT_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_READY;
+//   NRF_PPI->CH[RADIO_READY_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_READY_EVENT_GPIOTE_CH];
+// #endif
+// #if RADIO_TXEN_PIN
+//   NRF_PPI->CH[RADIO_T0_TX_EVENT_PPI_CH].EEP = (uint32_t)&NRF_TIMER0->EVENTS_COMPARE[0];
+//   NRF_PPI->CH[RADIO_T0_TX_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_TXEN_GPIOTE_CH];
+// #endif
+// #if RADIO_RXEN_PIN
+//   NRF_PPI->CH[RADIO_T0_RX_EVENT_PPI_CH].EEP = (uint32_t)&NRF_TIMER0->EVENTS_COMPARE[0];
+//   NRF_PPI->CH[RADIO_T0_RX_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_RXEN_GPIOTE_CH];
+// #endif
+// #if RTC_SCHEDULE_PIN
+//   //trick: RTC schedule function will trigger overflow event to mirror that on the GPIO for debugging purposes
+//   NRF_PPI->CH[RTC_SCHEDULE_PPI_CH].EEP = (uint32_t)&NRF_RTC1->EVENTS_OVRFLW;
+//   NRF_PPI->CH[RTC_SCHEDULE_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RTC_SCHEDULE_GPIOTE_CH];
+// #endif
+//
+//   /* get frame timestamp and start rssi sampling */
+//   NRF_PPI->CH[RADIO_FRAME_EVENT_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_FRAMESTART;
+//   NRF_PPI->CH[RADIO_FRAME_EVENT_PPI_CH].TEP = (uint32_t)&NRF_TIMER0->TASKS_CAPTURE[1];
+//   NRF_PPI->FORK[RADIO_FRAME_EVENT_PPI_CH].TEP = (uint32_t)&NRF_RADIO->TASKS_RSSISTART;
+//
+//   //Enable PPI channels
+// #if RADIO_ADDRESS_EVENT_PIN
+//   NRF_PPI->CHEN |= (1 << RADIO_ADDRESS_EVENT_PPI_CH);
+// #endif
+// #if RADIO_READY_EVENT_PIN
+//   NRF_PPI->CHEN |= (1 << RADIO_READY_EVENT_PPI_CH);
+// #endif
+// #if RTC_SCHEDULE_PIN
+//   NRF_PPI->CHEN |= (1 << RTC_SCHEDULE_PPI_CH);
+// #endif
 
-  /* Unonfigure the channel as the caller expects */
-  for (int i = 0; i < 8; i++)
-  {
-    NRF_GPIOTE->CONFIG[i] = (GPIOTE_CONFIG_MODE_Disabled << GPIOTE_CONFIG_MODE_Pos) |
-                            (31UL << GPIOTE_CONFIG_PSEL_Pos) |
-                            (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos);
-  }
-  /* Three NOPs are required to make sure configuration is written before setting tasks or getting events */
-  __NOP();
-  __NOP();
-  __NOP();
-  //configure GPIOTE
-#if RADIO_ADDRESS_EVENT_PIN
-  NRF_GPIOTE->CONFIG[RADIO_ADDRESS_EVENT_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
-                                                      (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
-                                                      (RADIO_ADDRESS_EVENT_PIN << GPIOTE_CONFIG_PSEL_Pos) |
-                                                      (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
+#if RADIO_TX_PIN
+  NRF_GPIOTE->CONFIG[RADIO_TXRX_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
+                                                (RADIO_TX_PIN << GPIOTE_CONFIG_PSEL_Pos);
+  NRF_PPI->CH[RADIO_READY_EVENT_PPI_CH].EEP = (uint32_t) (&NRF_RADIO->EVENTS_READY); // READY
+  NRF_PPI->CH[RADIO_READY_EVENT_PPI_CH].TEP = (uint32_t) (&NRF_GPIOTE->TASKS_SET[RADIO_TXRX_GPIOTE_CH]);
+  NRF_PPI->CH[RADIO_END_EVENT_PPI_CH].EEP = (uint32_t) (&NRF_RADIO->EVENTS_END);
+  NRF_PPI->CH[RADIO_END_EVENT_PPI_CH].TEP = (uint32_t) (&NRF_GPIOTE->TASKS_CLR[RADIO_TXRX_GPIOTE_CH]);
+  NRF_PPI->CHEN |= (1 << RADIO_READY_EVENT_PPI_CH) | (1 << RADIO_END_EVENT_PPI_CH);
 #endif
-#if RADIO_READY_EVENT_PIN
-  NRF_GPIOTE->CONFIG[RADIO_READY_EVENT_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
-                                                    (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
-                                                    (RADIO_READY_EVENT_PIN << GPIOTE_CONFIG_PSEL_Pos) |
-                                                    (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
-#endif
-#if RADIO_TXEN_PIN
-  NRF_GPIOTE->CONFIG[RADIO_TXEN_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
-                                             (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
-                                             (RADIO_TXEN_PIN << GPIOTE_CONFIG_PSEL_Pos) |
-                                             (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
-#endif
-#if RADIO_TXEN_PIN
-  NRF_GPIOTE->CONFIG[RADIO_RXEN_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
-                                             (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
-                                             (RADIO_RXEN_PIN << GPIOTE_CONFIG_PSEL_Pos) |
-                                             (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
-#endif
+
 #if RTC_FIRE_PIN
   NRF_GPIOTE->CONFIG[RTC_FIRE_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
-                                             (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
-                                             (RTC_FIRE_PIN << GPIOTE_CONFIG_PSEL_Pos) |
-                                             (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
-#endif
-#if RTC_SCHEDULE_PIN
-  NRF_GPIOTE->CONFIG[RTC_SCHEDULE_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
-                                             (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
-                                             (RTC_SCHEDULE_PIN << GPIOTE_CONFIG_PSEL_Pos) |
-                                             (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
-#endif
-
-  /* Three NOPs are required to make sure configuration is written before setting tasks or getting events */
-  __NOP();
-  __NOP();
-  __NOP();
-
-  /* Clear the event that appears in some cases */
-#if RADIO_ADDRESS_EVENT_PIN
-  NRF_GPIOTE->EVENTS_IN[RADIO_ADDRESS_EVENT_GPIOTE_CH] = 0;
-#endif
-#if RADIO_TXEN_PIN
-  NRF_GPIOTE->EVENTS_IN[RADIO_TXEN_GPIOTE_CH]          = 0;
-#endif
-#if RADIO_RXEN_PIN
-  NRF_GPIOTE->EVENTS_IN[RADIO_RXEN_GPIOTE_CH]          = 0;
-#endif
-#if RTC_FIRE_PIN
-  NRF_GPIOTE->EVENTS_IN[RTC_FIRE_GPIOTE_CH]            = 0;
-#endif
-#if RTC_SCHEDULE_PIN
-  NRF_GPIOTE->EVENTS_IN[RTC_SCHEDULE_GPIOTE_CH]        = 0;
-#endif
-
-  // NRF_GPIOTE->CONFIG[RADIO_PAYLOAD_GPIOTE_CH] = (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos) |
-  //                                       (GPIOTE_CONFIG_POLARITY_LoToHi << GPIOTE_CONFIG_POLARITY_Pos) |
-  //                                       (RADIO_PAYLOAD_PIN << GPIOTE_CONFIG_PSEL_Pos) |
-  //                                       (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
-
-  //Link radio events to GPIOTE
-#if RADIO_ADDRESS_EVENT_PIN
-  NRF_PPI->CH[RADIO_ADDRESS_EVENT_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_ADDRESS;
-  NRF_PPI->CH[RADIO_ADDRESS_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_ADDRESS_EVENT_GPIOTE_CH];
-#endif
-  // #if RADIO_END_EVENT_PIN
-  // NRF_PPI->CH[RADIO_END_EVENT_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_END;
-  // NRF_PPI->CH[RADIO_END_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_ADDRESS_EVENT_GPIOTE_CH];
-  // #endif
-#if RADIO_READY_EVENT_PIN
-  NRF_PPI->CH[RADIO_READY_EVENT_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_READY;
-  NRF_PPI->CH[RADIO_READY_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_READY_EVENT_GPIOTE_CH];
-#endif
-// #if RADIO_DISABLED_EVENT_PIN
-  // NRF_PPI->CH[RADIO_DISABLED_EVENT_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_DISABLED;
-  // NRF_PPI->CH[RADIO_DISABLED_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_READY_EVENT_GPIOTE_CH];
-// #endif
-  // NRF_PPI->CH[RADIO_PAYLOAD_EVENT_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_PAYLOAD;
-  // NRF_PPI->CH[RADIO_PAYLOAD_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_PAYLOAD_GPIOTE_CH];
-#if RADIO_TXEN_PIN
-  NRF_PPI->CH[RADIO_T0_TX_EVENT_PPI_CH].EEP = (uint32_t)&NRF_TIMER0->EVENTS_COMPARE[0];
-  NRF_PPI->CH[RADIO_T0_TX_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_TXEN_GPIOTE_CH];
-#endif
-#if RADIO_RXEN_PIN
-  NRF_PPI->CH[RADIO_T0_RX_EVENT_PPI_CH].EEP = (uint32_t)&NRF_TIMER0->EVENTS_COMPARE[0];
-  NRF_PPI->CH[RADIO_T0_RX_EVENT_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RADIO_RXEN_GPIOTE_CH];
-#endif
-
-#if RTC_FIRE_PIN
+                                              (RTC_FIRE_PIN << GPIOTE_CONFIG_PSEL_Pos) |
+                                              (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos) |
+                                              (GPIOTE_CONFIG_OUTINIT_Low << GPIOTE_CONFIG_OUTINIT_Pos);
   NRF_PPI->CH[RTC_FIRE_PPI_CH].EEP = (uint32_t)&NRF_RTC1->EVENTS_COMPARE[1];
   NRF_PPI->CH[RTC_FIRE_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RTC_FIRE_GPIOTE_CH];
-#endif
-
-#if RTC_SCHEDULE_PIN
-  //trick: RTC schedule function will trigger overflow event to mirror that on the GPIO for debugging purposes
-  // NRF_PPI->CH[RTC_SCHEDULE_PPI_CH].EEP = (uint32_t)&NRF_RTC1->EVENTS_OVRFLW;
-  // NRF_PPI->CH[RTC_SCHEDULE_PPI_CH].TEP = (uint32_t)&NRF_GPIOTE->TASKS_OUT[RTC_SCHEDULE_GPIOTE_CH];
-#endif
-
-  /* get frame timestamp and start rssi sampling */
-  NRF_PPI->CH[RADIO_FRAME_EVENT_PPI_CH].EEP = (uint32_t)&NRF_RADIO->EVENTS_FRAMESTART;
-  NRF_PPI->CH[RADIO_FRAME_EVENT_PPI_CH].TEP = (uint32_t)&NRF_TIMER0->TASKS_CAPTURE[1];
-  NRF_PPI->FORK[RADIO_FRAME_EVENT_PPI_CH].TEP = (uint32_t)&NRF_RADIO->TASKS_RSSISTART;
-
-  //Enable PPI channels
-  // NRF_PPI->CHEN |= (1 << RADIO_READY_EVENT_PPI_CH) | (1 << RADIO_DISABLED_EVENT_PPI_CH) | (1 << RADIO_PAYLOAD_EVENT_PPI_CH) | (1 << RADIO_ADDRESS_EVENT_PPI_CH) | (1 << RADIO_END_EVENT_PPI_CH);
-  // NRF_PPI->CHEN |= (1 << RADIO_ADDRESS_EVENT_PPI_CH);
-#if RADIO_ADDRESS_EVENT_PIN
-  NRF_PPI->CHEN |= (1 << RADIO_ADDRESS_EVENT_PPI_CH);
-#endif
-#if RADIO_READY_EVENT_PIN
-  NRF_PPI->CHEN |= (1 << RADIO_READY_EVENT_PPI_CH);
-#endif
-#if RTC_SCHEDULE_PIN
-  NRF_PPI->CHEN |= (1 << RTC_SCHEDULE_PPI_CH);
-#endif
-#if RTC_FIRE_PIN
   NRF_PPI->CHEN |= (1 << RTC_FIRE_PPI_CH);
 #endif
 
-NRF_GPIOTE->CONFIG[1] = (RADIO_TX_PIN << GPIOTE_CONFIG_PSEL_Pos) | (GPIOTE_CONFIG_MODE_Task << GPIOTE_CONFIG_MODE_Pos);
-NRF_PPI->CH[2].TEP = (uint32_t) (&NRF_GPIOTE->TASKS_CLR[1]);
-NRF_PPI->CH[2].EEP = (uint32_t) (&NRF_RADIO->EVENTS_END);
-NRF_PPI->CH[3].TEP = (uint32_t) (&NRF_GPIOTE->TASKS_SET[1]);
-NRF_PPI->CH[3].EEP = (uint32_t) (&NRF_RADIO->EVENTS_READY); // READY
-NRF_PPI->CHENSET = (1 << 2) | (1 << 3);
 
-#endif
 }
 /*---------------------------------------------------------------------------*/
 static void timer1_init(void)
 {
   /* Check if the HF clock is running*/
-  if ((NRF_CLOCK->HFCLKSTAT & CLOCK_HFCLKSTAT_STATE_Msk) == 0) {
-    hfclk_xtal_init ();
-  }
+  // if ((NRF_CLOCK->HFCLKSTAT & CLOCK_HFCLKSTAT_STATE_Msk) == 0) {
+  //   hfclk_xtal_init ();
+  // }
 
   /* Clear the task to make sure the timer is stopped */
   //NRF_TIMER1->TASKS_STOP  = 1;
@@ -684,6 +659,9 @@ void testbed_cofigure_pins()
 #ifdef RADIO_RXEN_PIN
   nrf_gpio_cfg_output(RADIO_RXEN_PIN);
 #endif
+#ifdef RADIO_TX_PIN
+  nrf_gpio_cfg_output(RADIO_TX_PIN);
+#endif
 }
 
 void testbed_clear_debug_pins()
@@ -696,6 +674,12 @@ void testbed_clear_debug_pins()
   nrf_gpio_pin_clear(ROUND_INDICATOR_PIN);
 
   /* clear the other gpio pins */
+#ifdef RTC_SCHEDULE_PIN
+  nrf_gpio_pin_clear(RTC_SCHEDULE_PIN);
+#endif
+#ifdef RTC_FIRE_PIN
+  nrf_gpio_pin_clear(RTC_FIRE_PIN);
+#endif
 #ifdef RADIO_ADDRESS_EVENT_PIN
   nrf_gpio_pin_clear(RADIO_ADDRESS_EVENT_PIN);
 #endif
@@ -705,10 +689,7 @@ void testbed_clear_debug_pins()
 #ifdef RADIO_RXEN_PIN
   nrf_gpio_pin_clear(RADIO_RXEN_PIN);
 #endif
-#ifdef RTC_SCHEDULE_PIN
-  nrf_gpio_pin_clear(RTC_SCHEDULE_PIN);
-#endif
-#ifdef RTC_FIRE_PIN
-  nrf_gpio_pin_clear(RTC_FIRE_PIN);
+#ifdef RADIO_TX_PIN
+  nrf_gpio_pin_clear(RADIO_TX_PIN);
 #endif
 }

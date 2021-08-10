@@ -87,9 +87,9 @@
 #define RADIO_TEST_TX_CARRIER false
 #endif
 /*---------------------------------------------------------------------------*/
-#define TRIGGER_RADIO_START_WITH_TIMER (true)
-#define NRF_RADIO_DEBUG_STATE (TESTBED!=GRAZ_TESTBED)
-#define RADIO_REV_C_OR_RADIO_REV_1 false
+#define TRIGGER_RADIO_START_WITH_TIMER  1
+#define NRF_RADIO_DEBUG_STATE           1
+#define RADIO_REV_C_OR_RADIO_REV_1      0
 /*---------------------------------------------------------------------------*/
 #define BLE_MODE_BIT_TIME_X2(M) ( (M==RADIO_MODE_MODE_Ble_1Mbit) ? 2 : ((M==RADIO_MODE_MODE_Ble_2Mbit) ? 1 : ((M==RADIO_MODE_MODE_Ble_LR500Kbit) ? 4 : ((M==RADIO_MODE_MODE_Ble_LR125Kbit) ? 16 : ((M==RADIO_MODE_MODE_Ieee802154_250Kbit) ? 8 : 0)))) )
 
@@ -318,23 +318,23 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
 /* Output radio state on GPIO */
 #define PORT(P,PIN)                     ((P)*32uL+(PIN))
 
-#if TESTBED==GRAZ_TESTBED
-#define LED1_PIN                        PORT(1,5)
-#define LED2_PIN                        PORT(1,6)
-#define LED3_PIN                        PORT(1,7)
-#define LED4_PIN                        PORT(1,8)
-
-#define ROUND_INDICATOR_PIN             LED2_PIN
-#define SLOT1_INDICATOR_PIN             LED3_PIN
-#define RADIO_ADDRESS_EVENT_PIN         LED4_PIN
-// #define RADIO_READY_EVENT_PIN        PORT(1,11) // disabled
-#define RADIO_TXEN_PIN                  PORT(1,2) // txen
-#define RADIO_RXEN_PIN                  PORT(1,3) // rxen
-// #define RADIO_PAYLOAD_PIN            PORT(1,14) // payload
-// #define RTC_SCHEDULE_PIN             PORT(1,11)  //disabled
-#define RTC_FIRE_PIN                    PORT(1,4)
-
-#else
+// #if TESTBED==GRAZ_TESTBED
+// #define LED1_PIN                        PORT(1,5)
+// #define LED2_PIN                        PORT(1,6)
+// #define LED3_PIN                        PORT(1,7)
+// #define LED4_PIN                        PORT(1,8)
+//
+// #define ROUND_INDICATOR_PIN             LED2_PIN
+// #define SLOT1_INDICATOR_PIN             LED3_PIN
+// #define RADIO_ADDRESS_EVENT_PIN         LED4_PIN
+// // #define RADIO_READY_EVENT_PIN        PORT(1,11) // disabled
+// #define RADIO_TXEN_PIN                  PORT(1,2) // txen
+// #define RADIO_RXEN_PIN                  PORT(1,3) // rxen
+// // #define RADIO_PAYLOAD_PIN            PORT(1,14) // payload
+// // #define RTC_SCHEDULE_PIN             PORT(1,11)  //disabled
+// #define RTC_FIRE_PIN                    PORT(1,4)
+//
+// #else
 #define LED1_PIN                        PORT(0,13)
 #define LED2_PIN                        PORT(0,14)
 #define LED3_PIN                        PORT(0,15)
@@ -344,37 +344,35 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
 #define SLOT1_INDICATOR_PIN             LED3_PIN
 // #define RADIO_ADDRESS_EVENT_PIN         PORT(1,10) // address
 // #define RADIO_READY_EVENT_PIN           PORT(1,11) // ready
-// #define RADIO_TXEN_PIN                  PORT(1,12) // txen
-// #define RADIO_RXEN_PIN                  PORT(1,13) // rxen
-// #define RADIO_PAYLOAD_PIN            PORT(1,14) // payload
+// #define RADIO_END_EVENT_PIN           PORT(1,11) // end
+// #define RADIO_TXEN_PIN                  PORT(0,29) // txen
+// #define RADIO_RXEN_PIN                  PORT(0,29) // rxen
 // #define RTC_SCHEDULE_PIN                PORT(0,30)
-// #define RTC_FIRE_PIN                    PORT(0,31)
+// #define RTC_FIRE_PIN                    PORT(0,30)
 #define RADIO_TX_PIN                    PORT(0,31)
-#endif /* TESTBED==GRAZ_TESTBED */
+// #endif /* TESTBED==GRAZ_TESTBED */
 
 // Peripheral channel assignments
 #define RADIO_ADDRESS_EVENT_GPIOTE_CH   0UL //PPI
 #define RADIO_READY_EVENT_GPIOTE_CH     1UL //PPI
-#define RADIO_TXEN_GPIOTE_CH            2UL //manual control
-#define RADIO_RXEN_GPIOTE_CH            3UL //manual control
-#define RADIO_PAYLOAD_GPIOTE_CH         4UL //manual control
+#define RADIO_END_EVENT_GPIOTE_CH       2UL //PPI
+#define RADIO_TXEN_GPIOTE_CH            3UL //manual control
+#define RADIO_RXEN_GPIOTE_CH            4UL //manual control
 #define RTC_FIRE_GPIOTE_CH              5UL //???
 #define RTC_SCHEDULE_GPIOTE_CH          6UL //manual control
-#define RADIO_TX_GPIOTE_CH              1UL //manual control
+#define RADIO_TXRX_GPIOTE_CH            7UL //PPI
 
 #define RADIO_ADDRESS_EVENT_PPI_CH      0UL
-#define RADIO_END_EVENT_PPI_CH          1UL
-#define RADIO_READY_EVENT_PPI_CH        2UL
+#define RADIO_READY_EVENT_PPI_CH        1UL
+#define RADIO_END_EVENT_PPI_CH          2UL
 #define RADIO_T0_TX_EVENT_PPI_CH        3UL
 #define RADIO_T0_RX_EVENT_PPI_CH        4UL
-// #define RADIO_PAYLOAD_EVENT_PPI_CH     5UL
 #define RADIO_FRAME_EVENT_PPI_CH        5UL
-#define RADIO_DISABLED_EVENT_PPI_CH     6UL
 
-#define TIMER0C0_TIMER1_START_PPI_CH    7UL
-#define TIMER1_RADIO_START_PPI_CH       8UL
-#define RTC_FIRE_PPI_CH                 9UL
-#define RTC_SCHEDULE_PPI_CH             10UL
+#define TIMER0C0_TIMER1_START_PPI_CH    6UL
+#define TIMER1_RADIO_START_PPI_CH       7UL
+#define RTC_FIRE_PPI_CH                 8UL
+#define RTC_SCHEDULE_PPI_CH             9UL
 
 
 #if 0
@@ -397,7 +395,7 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
     while(!(cond) && RTIMER_CLOCK_LT(RTIMER_NOW(), t0)); \
   } while(0)
 
-#define MAX(A,B) (((A)>(B))? (A) : (B))
+// #define MAX(A,B) (((A)>(B))? (A) : (B))
 
 #define get_radio_rssi() ((int8_t)(-(int8_t)(NRF_RADIO->RSSISAMPLE)))
 
@@ -444,6 +442,7 @@ void schedule_tx_t_from_rx(uint8_t* buf, int channel, rtimer_clock_t t);
 void schedule_tx_abs(uint8_t* buf, int channel, rtimer_clock_t t_abs);
 /* TX after t ticks from now */
 void schedule_tx(uint8_t* buf, int channel, rtimer_clock_t t);
+void my_radio_gpio_init(void);
 void testbed_cofigure_pins();
 void testbed_clear_debug_pins();
 #endif /* _NRF_RADIO_DRIVER_H_ */
