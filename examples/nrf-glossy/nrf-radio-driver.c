@@ -42,7 +42,7 @@ static uint8_t nrf_tx_power = BLE_DEFAULT_RF_POWER;
 /* Bluetooth advertising channels: 0-39 */
 // const uint8_t ble_adv_channels[128] = {3, 15, 12, 21, 8, 6, 3, 20, 8, 30, 3, 8, 23, 36, 3, 34, 5, 9, 21, 14, 26, 35, 7, 29, 38, 4, 18, 15, 28, 26, 23, 39, 1, 4, 38, 24, 23, 9, 32, 21, 6, 30, 11, 4, 20, 37, 33, 14, 35, 15, 24, 37, 36, 33, 19, 20, 34, 22, 29, 34, 27, 23, 21, 12, 30, 33, 11, 4, 17, 14, 33, 20, 15, 22, 38, 37, 34, 31, 3, 2, 10, 6, 14, 10, 15, 16, 1, 4, 7, 1, 24, 33, 5, 11, 21, 33, 13, 11, 33, 24, 8, 9, 12, 4, 22, 37, 4, 27, 34, 29, 11, 13, 36, 21, 11, 3, 26, 30, 8, 1, 38, 14, 27, 36, 13, 20, 5, 8};
 /*---------------------------------------------------------------------------*/
-static void output_radio_events_gpio_init(void);
+// static void output_radio_events_gpio_init(void);
 static void timer1_init(void);
 /*---------------------------------------------------------------------------*/
 void my_radio_set_tx_power(uint8_t p){
@@ -643,7 +643,6 @@ void testbed_cofigure_pins()
   nrf_gpio_range_cfg_input(PORT(0,24),PORT(0,25), NRF_GPIO_PIN_NOPULL);
 
   nrf_gpio_range_cfg_output(LED1_PIN,LED4_PIN);//LEDS
-  nrf_gpio_cfg_output(ROUND_INDICATOR_PIN);
 #ifdef RTC_SCHEDULE_PIN
   nrf_gpio_cfg_output(RTC_SCHEDULE_PIN);//other gpio debugging pins
 #endif

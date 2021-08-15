@@ -340,6 +340,7 @@ extern const uint8_t ble_channels_list[NUMBER_OF_CHANNELS];
 #define LED3_PIN                        PORT(0,15)
 #define LED4_PIN                        PORT(0,16)
 
+#define INITIATOR_INDICATOR_PIN         LED1_PIN
 #define ROUND_INDICATOR_PIN             LED2_PIN
 #define SLOT1_INDICATOR_PIN             LED3_PIN
 // #define RADIO_ADDRESS_EVENT_PIN         PORT(1,10) // address

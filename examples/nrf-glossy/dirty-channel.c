@@ -237,6 +237,7 @@ PROCESS_THREAD(tx_process, ev, data)
   if(IS_INITIATOR()){
     // BUSYWAIT_UNTIL(0, RTIMER_SECOND);
     nrf_delay_ms(2000);
+    nrf_gpio_pin_clear(INITIATOR_INDICATOR_PIN); // Set LED1 to indicate initiator
   } else{
     nrf_delay_ms(1000);
   }
@@ -280,7 +281,6 @@ PROCESS_THREAD(tx_process, ev, data)
       initiator_node_index = INITATOR_NODE_INDEX;
     }
     #endif /* ROUND_ROBIN_INITIATOR */
-    // nrf_gpio_cfg_output(ROUND_INDICATOR_PIN);
     nrf_gpio_pin_toggle(ROUND_INDICATOR_PIN);
     for(slot = 0; ROUND_LEN_RULE; slot++){
       logslot = slot + 1;
